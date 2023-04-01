@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">TrainTicketApp</string>
+    <string name="app_name">Train Ticket App</string>
+    <string name="login">Bejelentkezés</string>
+    <string name="email">Email</string>
+    <string name="password">Jelszó</string>
+    <string name="from">Honnan</string>
+    <string name="destination">Hová</string>
+    <string name="when">Mikor</string>
+    <string name="search">Keresés</string>
 </resources>
