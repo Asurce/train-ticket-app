@@ -1,17 +1,14 @@
 package hu.mobilalk.trainticketapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -20,6 +17,8 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText emailEditText;
     EditText passwordEditText;
+    Button loginButton;
+    Button registerButton;
     private FirebaseAuth fireAuth;
 
     @Override
@@ -28,25 +27,38 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         fireAuth = FirebaseAuth.getInstance();
+        emailEditText = findViewById(R.id.registerEmailEditText);
+        passwordEditText = findViewById(R.id.registerPasswordEditText);
+        loginButton = findViewById(R.id.loginOrTicketButton);
+        registerButton = findViewById(R.id.registerButton);
 
+        if (fireAuth.getCurrentUser() != null) {
+            finish();
+        }
+//        int secretKey = getIntent().getIntExtra("SECRET_KEY", 0);
+//        if (secretKey!=99) finish();
 
-        int secretKey = getIntent().getIntExtra("SECRET_KEY", 0);
-        if (secretKey!=99) finish();
-
-        Button loginButton = (Button) findViewById(R.id.loginButton);
-        loginButton.setOnClickListener(view -> {
-            emailEditText = findViewById(R.id.loginEmailEditText);
-            passwordEditText = findViewById(R.id.loginPasswordEditText);
-
-            fireAuth.signInWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) Log.i(LOG_TAG, "Login successful!");
-                        else Log.i(LOG_TAG, "Login FAILED!");
-                    });
-
-
-            Log.i(LOG_TAG, "LOGIN -- Email: "+emailEditText.getText()+" - Password: "+passwordEditText.getText());
-        });
+        loginButton.setOnClickListener(this::login);
+        registerButton.setOnClickListener(this::register);
 
     }
+
+    public void login(View view) {
+        fireAuth.signInWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        Log.i(LOG_TAG, "Login successful!");
+                        startActivity(new Intent(this, MainActivity.class));
+                    }
+                    else Log.i(LOG_TAG, "Login FAILED!");
+                });
+
+
+        Log.i(LOG_TAG, "LOGIN -- Email: "+emailEditText.getText()+" - Password: "+passwordEditText.getText());
+    }
+
+    public void register(View view) {
+        startActivity(new Intent(this, RegisterActivity.class));
+    }
+
 }

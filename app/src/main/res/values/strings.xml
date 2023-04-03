@@ -7,4 +7,9 @@
     <string name="destination">Hová</string>
     <string name="when">Mikor</string>
     <string name="search">Keresés</string>
+    <string name="my_tickets">Jegyeim</string>
+    <string name="register">Regisztráció</string>
+    <string name="last_name">Vezetéknév</string>
+    <string name="first_name">Keresztnév</string>
+    <string name="password_again">Jelszó ismét</string>
 </resources>
