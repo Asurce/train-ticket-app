@@ -2,21 +2,40 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
 
-    <TextView
-        android:id="@+id/cityTextView"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="VÁROS"
-        android:textAlignment="center"
-        android:textSize="30sp"/>
+        android:padding="8dp">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="150dp"
-        android:text="Back"/>
+        <TextView
+            android:id="@+id/timeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:00"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            android:layout_centerVertical="true"/>
 
+        <TextView
+            android:id="@+id/cityTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="VÁROS"
+            android:textAlignment="center"
+            android:textSize="15sp"
+            android:layout_toEndOf="@+id/timeTextView"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Buy"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

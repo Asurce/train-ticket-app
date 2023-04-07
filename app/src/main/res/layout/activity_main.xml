@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    android:background="@color/blue_50"
     android:padding="20dp"
-    android:background="@color/blue_50">
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/appTitleTextView"
@@ -32,10 +31,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appTitleTextView"
-        app:layout_constraintVertical_bias="0.1"/>
+        app:layout_constraintVertical_bias="0.1" />
 
-    <EditText
-        android:id="@+id/toEditText"
+    <AutoCompleteTextView
+        android:id="@+id/toACTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -45,20 +44,119 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fromACTV"
-        app:layout_constraintVertical_bias="0.1"/>
+        app:layout_constraintVertical_bias="0.1" />
 
-    <EditText
-        android:id="@+id/whenEditText"
+    <LinearLayout
+        android:id="@+id/whenLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/when"
-        android:inputType="date|datetime"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toEditText"
+        app:layout_constraintTop_toBottomOf="@+id/toACTV"
+        app:layout_constraintVertical_bias="0.1">
+
+        <Button
+            android:id="@+id/dateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/calendar" />
+
+        <Button
+            android:id="@+id/timeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:drawableEnd="@drawable/clock" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/discountTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Kedvezmények"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/whenLinearLayout"
         app:layout_constraintVertical_bias="0.1" />
+
+    <RadioGroup
+        android:id="@+id/discountRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/discountTextView"
+        app:layout_constraintVertical_bias="0.0">
+
+        <RadioButton
+            android:id="@+id/noDiscountRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="nincs" />
+
+        <RadioButton
+            android:id="@+id/fiftyDiscountRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="50%" />
+
+        <RadioButton
+            android:id="@+id/ninetyDiscountRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="90%" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/classTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Helyjegy"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/discountRadioGroup"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <RadioGroup
+        android:id="@+id/classRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/classTextView"
+        app:layout_constraintVertical_bias="0.0">
+
+        <RadioButton
+            android:id="@+id/fastTrainRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="gyorsvonat" />
+
+        <RadioButton
+            android:id="@+id/secondClassRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2. osztály" />
+
+        <RadioButton
+            android:id="@+id/firstClassRB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1. osztály" />
+
+    </RadioGroup>
 
     <Button
         android:id="@+id/searchButton"
@@ -68,27 +166,31 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/whenEditText"
+        app:layout_constraintTop_toBottomOf="@+id/classRadioGroup"
         app:layout_constraintVertical_bias="0.1" />
 
-    <Button
-        android:id="@+id/loginOrTicketButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchButton"/>
+        app:layout_constraintTop_toBottomOf="@+id/searchButton"
+        app:layout_constraintVertical_bias="0.5">
 
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Kijelentkezés"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loginOrTicketButton" />
+        <Button
+            android:id="@+id/loginOrTicketButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="Kijelentkezés" />
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
