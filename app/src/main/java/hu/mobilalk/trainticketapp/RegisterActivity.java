@@ -19,12 +19,17 @@ import com.google.firebase.auth.FirebaseAuth;
 public class RegisterActivity extends AppCompatActivity {
     private static final String LOG_TAG = RegisterActivity.class.getName();
 
+    // FIREBASE
     FirebaseAuth fireAuth;
+
+    // INPUTS
     EditText lastName;
     EditText firstName;
     EditText email;
     EditText password;
     EditText passwordAgain;
+
+    // BUTTONS
     Button registerButton;
 
     @Override
@@ -32,18 +37,19 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
+        if (fireAuth.getCurrentUser() != null) finish();
+
+        // INPUTS
         lastName = findViewById(R.id.lastNameEditText);
         firstName = findViewById(R.id.firstNameEditText);
         email = findViewById(R.id.registerEmailEditText);
         password = findViewById(R.id.registerPasswordEditText);
         passwordAgain = findViewById(R.id.registerPasswordAgainEditText);
+
+        // BUTTONS
         registerButton = findViewById(R.id.registerButton);
-
-        if (fireAuth.getCurrentUser() != null) {
-            finish();
-        }
-
         registerButton.setOnClickListener(this::register);
 
     }
@@ -58,10 +64,10 @@ public class RegisterActivity extends AppCompatActivity {
         fireAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Log.i(LOG_TAG, "User registered successfully!");
-                        startActivity(new Intent(this, MainActivity.class));
+                        Log.i(LOG_TAG, "User registration SUCCESSFUL!");
+                        finish();
                     } else {
-                        Log.i(LOG_TAG, "Registration failed!");
+                        Log.i(LOG_TAG, "User registration FAILED!");
                         Toast.makeText(RegisterActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                     }
                 });

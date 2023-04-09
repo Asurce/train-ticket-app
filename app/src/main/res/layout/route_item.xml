@@ -14,7 +14,7 @@
             android:id="@+id/timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12:00"
+            android:text="@string/placeholder"
             android:textAlignment="center"
             android:textSize="30sp"
             android:layout_centerVertical="true"/>
@@ -23,17 +23,18 @@
             android:id="@+id/cityTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="VÁROS"
+            android:text="@string/placeholder"
             android:textAlignment="center"
             android:textSize="15sp"
             android:layout_toEndOf="@+id/timeTextView"
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"/>
 
-        <Button
+        <ImageButton
+            android:id="@+id/buyButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Buy"
+            android:src="@drawable/cart"
             android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>

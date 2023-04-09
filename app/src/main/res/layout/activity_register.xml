@@ -8,13 +8,13 @@
     android:padding="20dp">
 
     <TextView
-        android:id="@+id/loginTextView"
+        android:id="@+id/registerTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:text="@string/register"
         android:textSize="24sp"
         android:textAlignment="center"
+        android:layout_marginTop="50dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"/>
 
@@ -22,10 +22,10 @@
         android:id="@+id/lastNameEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:ems="10"
         android:hint="@string/last_name"
         android:inputType="text"
+        android:layout_marginTop="50dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/loginTextView"/>
@@ -34,10 +34,10 @@
         android:id="@+id/firstNameEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
         android:ems="10"
         android:hint="@string/first_name"
         android:inputType="textEmailAddress"
+        android:layout_marginTop="25dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/lastNameEditText"/>
@@ -46,10 +46,10 @@
         android:id="@+id/registerEmailEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
         android:ems="10"
         android:hint="@string/email"
         android:inputType="textEmailAddress"
+        android:layout_marginTop="25dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/firstNameEditText"/>
@@ -58,10 +58,10 @@
         android:id="@+id/registerPasswordEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
         android:ems="10"
         android:hint="@string/password"
         android:inputType="textPassword"
+        android:layout_marginTop="25dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/registerEmailEditText"/>
@@ -70,10 +70,10 @@
         android:id="@+id/registerPasswordAgainEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
         android:ems="10"
         android:hint="@string/password_again"
         android:inputType="textPassword"
+        android:layout_marginTop="25dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/registerPasswordEditText"/>
@@ -82,11 +82,10 @@
         android:id="@+id/registerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:text="@string/register"
+        android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/registerPasswordAgainEditText"
-        />
+        android:layout_below="@id/registerPasswordAgainEditText"/>
 
 
 </RelativeLayout>

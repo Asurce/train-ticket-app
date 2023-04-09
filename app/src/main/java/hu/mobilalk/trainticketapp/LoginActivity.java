@@ -8,53 +8,51 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
-
 
 public class LoginActivity extends AppCompatActivity {
     private static final String LOG_TAG = LoginActivity.class.getName();
 
+    // FIREBASE
+    private FirebaseAuth fireAuth;
+
+    // INPUTS
     EditText emailEditText;
     EditText passwordEditText;
+
+    // BUTTONS
     Button loginButton;
     Button registerButton;
-    private FirebaseAuth fireAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
-        emailEditText = findViewById(R.id.registerEmailEditText);
-        passwordEditText = findViewById(R.id.registerPasswordEditText);
-        loginButton = findViewById(R.id.loginOrTicketButton);
-        registerButton = findViewById(R.id.registerButton);
+        if (fireAuth.getCurrentUser() != null) finish();
 
-        if (fireAuth.getCurrentUser() != null) {
-            finish();
-        }
-//        int secretKey = getIntent().getIntExtra("SECRET_KEY", 0);
-//        if (secretKey!=99) finish();
+        // INPUTS
+        emailEditText = findViewById(R.id.loginEmailEditText);
+        passwordEditText = findViewById(R.id.loginPasswordEditText);
+        loginButton = findViewById(R.id.loginButton);
+        registerButton = findViewById(R.id.registerButton);
 
         loginButton.setOnClickListener(this::login);
         registerButton.setOnClickListener(this::register);
-
     }
 
     public void login(View view) {
         fireAuth.signInWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Log.i(LOG_TAG, "Login successful!");
-                        startActivity(new Intent(this, MainActivity.class));
-                    }
-                    else Log.i(LOG_TAG, "Login FAILED!");
+                        Log.i(LOG_TAG, "Login SUCCESSFUL!");
+                        finish();
+                    } else Log.i(LOG_TAG, "Login FAILED!");
                 });
-
-
-        Log.i(LOG_TAG, "LOGIN -- Email: "+emailEditText.getText()+" - Password: "+passwordEditText.getText());
     }
 
     public void register(View view) {
