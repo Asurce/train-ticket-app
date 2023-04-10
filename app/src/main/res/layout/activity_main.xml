@@ -19,6 +19,27 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.1" />
 
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        android:id="@+id/originTIL"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/appTitleTextView"-->
+<!--        app:layout_constraintVertical_bias="0.1">-->
+
+<!--        <com.google.android.material.textfield.MaterialAutoCompleteTextView-->
+<!--            android:id="@+id/originACTV"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:ems="10"-->
+<!--            android:hint="@string/from"-->
+<!--            android:inputType="text"-->
+<!--            android:minHeight="48dp"/>-->
+
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+
     <AutoCompleteTextView
         android:id="@+id/originACTV"
         android:layout_width="match_parent"
@@ -196,8 +217,8 @@
             android:text="@string/logout" />
     </LinearLayout>
 
-<!--    <include-->
-<!--        android:id="@+id/loading_spinner"-->
-<!--        layout="@layout/loading_spinner"/>-->
+    <include
+        android:id="@+id/loading_spinner"
+        layout="@layout/loading_spinner"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

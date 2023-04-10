@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -23,6 +24,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import hu.mobilalk.trainticketapp.routes.RouteItem;
 import hu.mobilalk.trainticketapp.routes.RoutesActivity;
@@ -46,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
     AutoCompleteTextView destACTV;
     ArrayAdapter<String> originAdapter;
     ArrayAdapter<String> destAdapter;
-    String originCity;
-    String destCity;
-    List<String> citiesList;
+    City originCity;
+    City destCity;
+    List<City> citiesList;
+    List<String> cityNamesList;
 
     // DATE INPUT
     Button dateButton;
@@ -84,25 +88,46 @@ public class MainActivity extends AppCompatActivity {
         originACTV = findViewById(R.id.originACTV);
         destACTV = findViewById(R.id.destACTV);
         citiesList = new ArrayList<>();
+        cityNamesList = new ArrayList<>();
+
         originAdapter = new ArrayAdapter<>(
                 this,
                 com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
-                citiesList);
+                cityNamesList);
         originACTV.setAdapter(originAdapter);
         originACTV.setThreshold(1);
-        originACTV.setOnItemClickListener((adapterView, view, i, l) -> {
-            originCity = (String) adapterView.getItemAtPosition(i);
-            Log.i(LOG_TAG, "Selected start city: " + originCity);
+        originACTV.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                originCity = citiesList.get(i);
+                Log.i(LOG_TAG, "Selected destination city: " + destCity.getName());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                originCity = null;
+                Log.i(LOG_TAG, "Selected destination city: NONE");
+            }
         });
+
         destAdapter = new ArrayAdapter<>(
                 this,
                 com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
-                citiesList);
+                cityNamesList);
         destACTV.setAdapter(destAdapter);
         destACTV.setThreshold(1);
-        destACTV.setOnItemClickListener((adapterView, view, i, l) -> {
-            destCity = (String) adapterView.getItemAtPosition(i);
-            Log.i(LOG_TAG, "Selected destination city: " + destCity);
+        destACTV.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                destCity = citiesList.get(i);
+                Log.i(LOG_TAG, "Selected destination city: " + destCity.getName());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                destCity = null;
+                Log.i(LOG_TAG, "Selected destination city: NONE");
+            }
         });
 
         // DATE INPUT
@@ -177,7 +202,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void queryCities() {
         citiesCollection.get().addOnSuccessListener(queryDocumentSnapshots -> {
-            queryDocumentSnapshots.forEach(document -> citiesList.add((String) document.get("name")));
+            queryDocumentSnapshots.forEach(document -> {
+                citiesList.add(new City(
+                        (String) document.get("name"),
+                        (Long) document.get("distance"),
+                        (Long) document.get("routeID")
+                ));
+            });
+            cityNamesList = citiesList.stream().map(City::getName).collect(Collectors.toList());
             originAdapter.notifyDataSetChanged();
             destAdapter.notifyDataSetChanged();
 
@@ -188,20 +220,39 @@ public class MainActivity extends AppCompatActivity {
 
     public void search(View view) {
         if (originCity == null || destCity == null) {
-            Toast.makeText(this, "Az indulási és célállomást is ki kell választani!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Mindkét állomást ki kell választani!", Toast.LENGTH_SHORT).show();
         } else if (originCity.equals(destCity)) {
             Toast.makeText(this, "Válassz különböző állomásokat!", Toast.LENGTH_SHORT).show();
         } else {
 
             Log.i(LOG_TAG, calendar.getTime().toString());
 
+            Calendar arrive = Calendar.getInstance();
+            Long distance = 0L;
+
+            if (originCity.getRouteID() == 0) {
+                distance = destCity.getDistance();
+                arrive.setTimeInMillis(calendar.getTimeInMillis() + distance / 2 * 60000L);
+            } else if (Objects.equals(originCity.getRouteID(), destCity.getRouteID())) {
+                distance = Math.abs(originCity.getDistance() - destCity.getDistance());
+                arrive.setTimeInMillis(calendar.getTimeInMillis() +
+                        distance / 2 * 60000L);
+            } else {
+                distance = originCity.getDistance() + destCity.getDistance();
+                arrive.setTimeInMillis((calendar.getTimeInMillis() +
+                        distance / 2 * 60000L));
+            }
+
             Intent searchIntent = new Intent(this, RoutesActivity.class);
             searchIntent.putExtra("searchData", new RouteItem(
-                    originCity,
-                    destCity,
+                    originCity.getName(),
+                    destCity.getName(),
                     calendar.getTime(),
+                    arrive.getTime(),
                     discountRadioGroup.indexOfChild(findViewById(discountRadioGroup.getCheckedRadioButtonId())),
-                    classRadioGroup.indexOfChild(findViewById(classRadioGroup.getCheckedRadioButtonId()))));
+                    classRadioGroup.indexOfChild(findViewById(classRadioGroup.getCheckedRadioButtonId())),
+                    distance,
+                    (int)Math.log(distance)*150));
             startActivity(searchIntent);
         }
     }

@@ -36,7 +36,7 @@ public class RoutesActivity extends AppCompatActivity {
         // ANDROID, MISC
         calendar = Calendar.getInstance();
         searchData = (RouteItem) getIntent().getSerializableExtra("searchData");
-        calendar.setTime(searchData.getDate());
+        calendar.setTime(searchData.getDepartTime());
 
         // LISTING
         trainsRV = findViewById(R.id.trainRecyclerView);
@@ -53,13 +53,17 @@ public class RoutesActivity extends AppCompatActivity {
 
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
+
         while (calendar.get(Calendar.DAY_OF_MONTH) < day+1) {
             trainsList.add(new RouteItem(
                     searchData.getOriginCity(),
                     searchData.getDestCity(),
                     calendar.getTime(),
+                    calendar.getTime(),
                     searchData.getDiscount(),
-                    searchData.getComfort()
+                    searchData.getComfort(),
+                    searchData.getDistance(),
+                    searchData.getPrice()
                     ));
             calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR)+1);
         }

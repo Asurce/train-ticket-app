@@ -1,42 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    style="@style/Widget.Material3.CardView.Elevated">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:padding="8dp"
+        android:gravity="center">
 
-        <TextView
-            android:id="@+id/timeTextView"
+        <LinearLayout
+            android:id="@+id/originLinearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/placeholder"
-            android:textAlignment="center"
-            android:textSize="30sp"
-            android:layout_centerVertical="true"/>
+            android:orientation="vertical"
+            android:gravity="center">
 
-        <TextView
-            android:id="@+id/cityTextView"
+            <TextView
+                android:id="@+id/departTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/placeholder"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                />
+
+            <TextView
+                android:id="@+id/originCityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/placeholder"
+                android:textAlignment="center"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/arrowImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/placeholder"
-            android:textAlignment="center"
-            android:textSize="15sp"
-            android:layout_toEndOf="@+id/timeTextView"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"/>
+            android:src="@drawable/arrow_right"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp" />
 
-        <ImageButton
+        <LinearLayout
+            android:id="@+id/destLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/arriveTimeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/placeholder"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                />
+
+            <TextView
+                android:id="@+id/destCityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/placeholder"
+                android:textAlignment="center"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+
+        <Button
             android:id="@+id/buyButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/cart"
-            android:layout_alignParentEnd="true"/>
+            android:text="@string/placeholder"
+            android:drawableStart="@drawable/cart" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </androidx.cardview.widget.CardView>

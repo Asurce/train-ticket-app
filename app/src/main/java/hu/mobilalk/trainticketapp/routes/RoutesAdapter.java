@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
+import hu.mobilalk.trainticketapp.PurchaseActivity;
 import hu.mobilalk.trainticketapp.R;
 import hu.mobilalk.trainticketapp.tickets.TicketItem;
 import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
@@ -66,32 +67,38 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder {
 
         // TODO ROUTE FIELDS
-        TextView time;
-        TextView city;
-        ImageButton buyButton;
+        TextView departTimeTextView;
+        TextView originCityTextView;
+        TextView arriveTimeTextView;
+        TextView destCityTextView;
+        Button buyButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            time = itemView.findViewById(R.id.timeTextView);
-            city = itemView.findViewById(R.id.cityTextView);
+            departTimeTextView = itemView.findViewById(R.id.departTimeTextView);
+            originCityTextView = itemView.findViewById(R.id.originCityTextView);
+            arriveTimeTextView = itemView.findViewById(R.id.arriveTimeTextView);
+            destCityTextView = itemView.findViewById(R.id.destCityTextView);
             buyButton = itemView.findViewById(R.id.buyButton);
         }
 
         public void bindTo(RouteItem currentItem) {
-            time.setText(DateFormat.format("HH:mm", currentItem.getDate()));
-            city.setText(currentItem.getOriginCity() + " ---> " + currentItem.getDestCity());
+            departTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getDepartTime()));
+            originCityTextView.setText(currentItem.getOriginCity());
+            arriveTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getArriveTime()));
+            destCityTextView.setText(currentItem.getDestCity());
             buyButton.setOnClickListener(view -> buy(view, currentItem));
+            buyButton.setText(currentItem.getPrice() + "Ft");
         }
 
         public void buy(View view, RouteItem item) {
-
-            ticketsCollection.add(new TicketItem(
-                    item.getOriginCity(),
-                    item.getDestCity(),
-                    2500,
-                    item.getDate().getTime(),
-                    fireAuth.getCurrentUser().getUid()));
-            view.getContext().startActivity(new Intent(view.getContext(), TicketsActivity.class));
+//            ticketsCollection.add(new TicketItem(
+//                    item.getOriginCity(),
+//                    item.getDestCity(),
+//                    2500,
+//                    item.getDate().getTime(),
+//                    fireAuth.getCurrentUser().getUid()));
+            view.getContext().startActivity(new Intent(view.getContext(), PurchaseActivity.class));
         }
     }
 
