@@ -8,12 +8,12 @@ public class RouteItem implements Serializable {
     private String destCity;
     private Date departTime;
     private Date arriveTime;
-    private int discount;
-    private int comfort;
-    private Long distance;
-    private int price;
+    private Integer discount;
+    private Integer comfort;
+    private Integer distance;
+    private Integer price;
 
-    public RouteItem(String originCity, String destCity, Date departTime, Date arriveTime, int discount, int comfort, Long distance, int price) {
+    public RouteItem(String originCity, String destCity, Date departTime, Date arriveTime, Integer discount, Integer comfort, Integer distance, Integer price) {
         this.originCity = originCity;
         this.destCity = destCity;
         this.departTime = departTime;
@@ -56,35 +56,35 @@ public class RouteItem implements Serializable {
         this.arriveTime = arriveTime;
     }
 
-    public int getDiscount() {
+    public Integer getDiscount() {
         return discount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(Integer discount) {
         this.discount = discount;
     }
 
-    public int getComfort() {
+    public Integer getComfort() {
         return comfort;
     }
 
-    public void setComfort(int comfort) {
+    public void setComfort(Integer comfort) {
         this.comfort = comfort;
     }
 
-    public Long getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 
-    public void setDistance(Long distance) {
+    public void setDistance(Integer distance) {
         this.distance = distance;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 }

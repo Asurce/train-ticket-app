@@ -12,8 +12,11 @@
     <string name="last_name">Vezetéknév</string>
     <string name="first_name">Keresztnév</string>
     <string name="password_again">Jelszó ismét</string>
-    <string name="loading">Egy pillanat...</string>
+    <string name="loading">Egy pillanat…</string>
     <string name="discounts">Kedvezmények</string>
-    <string name="placeholder">placeholder</string>
+    <string name="placeholder">plchldr</string>
     <string name="logout">Kijelentkezés</string>
+    <string name="home_menu">Főmenü</string>
+    <string name="tickets_menu">Jegyeim</string>
+    <string name="settings_menu">Beállítások</string>
 </resources>

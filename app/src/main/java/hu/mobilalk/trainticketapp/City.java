@@ -1,11 +1,13 @@
 package hu.mobilalk.trainticketapp;
 
+import androidx.annotation.NonNull;
+
 public class City {
     private String name;
-    private Long distance;
-    private Long routeID;
+    private Integer distance;
+    private Integer routeID;
 
-    public City(String name, Long distance, Long routeID) {
+    public City(String name, Integer distance, Integer routeID) {
         this.name = name;
         this.distance = distance;
         this.routeID = routeID;
@@ -19,19 +21,25 @@ public class City {
         this.name = name;
     }
 
-    public Long getDistance() {
+    public Integer getDistance() {
         return distance;
     }
 
-    public void setDistance(Long distance) {
+    public void setDistance(Integer distance) {
         this.distance = distance;
     }
 
-    public Long getRouteID() {
+    public Integer getRouteID() {
         return routeID;
     }
 
-    public void setRouteID(Long routeID) {
+    public void setRouteID(Integer routeID) {
         this.routeID = routeID;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name;
     }
 }

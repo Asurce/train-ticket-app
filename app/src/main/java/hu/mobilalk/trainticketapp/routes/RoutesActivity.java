@@ -17,16 +17,18 @@ public class RoutesActivity extends AppCompatActivity {
     private static final String PREF_KEY = MainActivity.class.getPackage().toString();
 
     // ANDROID
-    Calendar calendar;
+    Calendar inputDate;
+    Calendar calcDate;
 
     // LISTING
-    RecyclerView trainsRV;
-    ArrayList<RouteItem> trainsList;
+    RecyclerView routesRV;
+    ArrayList<RouteItem> routesList;
 
     RoutesAdapter routesAdapter;
 
     // MISC
     RouteItem searchData;
+    boolean isDepartDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,38 +36,41 @@ public class RoutesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_routes);
 
         // ANDROID, MISC
-        calendar = Calendar.getInstance();
+        inputDate = Calendar.getInstance();
+        calcDate = Calendar.getInstance();
         searchData = (RouteItem) getIntent().getSerializableExtra("searchData");
-        calendar.setTime(searchData.getDepartTime());
+        isDepartDate = getIntent().getBooleanExtra("isDepartDate", true);
+        inputDate.setTime(searchData.getDepartTime());
+        calcDate.setTime(searchData.getArriveTime());
 
         // LISTING
-        trainsRV = findViewById(R.id.trainRecyclerView);
-        trainsList = new ArrayList<>();
-        routesAdapter = new RoutesAdapter(this, trainsList);
-        trainsRV.setLayoutManager(new LinearLayoutManager(this));
-        trainsRV.setAdapter(routesAdapter);
+        routesRV = findViewById(R.id.trainRecyclerView);
+        routesList = new ArrayList<>();
+        routesAdapter = new RoutesAdapter(this, routesList);
+        routesRV.setLayoutManager(new LinearLayoutManager(this));
+        routesRV.setAdapter(routesAdapter);
 
         initializeData();
     }
 
     private void initializeData() {
-        trainsList.clear();
+        routesList.clear();
 
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int day = inputDate.get(Calendar.DAY_OF_MONTH);
 
-
-        while (calendar.get(Calendar.DAY_OF_MONTH) < day+1) {
-            trainsList.add(new RouteItem(
+        while (inputDate.get(Calendar.DAY_OF_MONTH) < day+1) {
+            routesList.add(new RouteItem(
                     searchData.getOriginCity(),
                     searchData.getDestCity(),
-                    calendar.getTime(),
-                    calendar.getTime(),
+                    inputDate.getTime(),
+                    calcDate.getTime(),
                     searchData.getDiscount(),
                     searchData.getComfort(),
                     searchData.getDistance(),
                     searchData.getPrice()
                     ));
-            calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR)+1);
+            inputDate.set(Calendar.HOUR, inputDate.get(Calendar.HOUR)+1);
+            calcDate.set(Calendar.HOUR, calcDate.get(Calendar.HOUR)+1);
         }
 
         routesAdapter.notifyDataSetChanged();

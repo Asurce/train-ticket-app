@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
     tools:context=".MainActivity">
 
     <TextView
@@ -15,58 +14,56 @@
         android:textSize="26sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.07"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1" />
+        app:layout_constraintVertical_bias="0.05" />
 
-<!--    <com.google.android.material.textfield.TextInputLayout-->
-<!--        android:id="@+id/originTIL"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/appTitleTextView"-->
-<!--        app:layout_constraintVertical_bias="0.1">-->
-
-<!--        <com.google.android.material.textfield.MaterialAutoCompleteTextView-->
-<!--            android:id="@+id/originACTV"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:ems="10"-->
-<!--            android:hint="@string/from"-->
-<!--            android:inputType="text"-->
-<!--            android:minHeight="48dp"/>-->
-
-<!--    </com.google.android.material.textfield.TextInputLayout>-->
-
-    <AutoCompleteTextView
-        android:id="@+id/originACTV"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/originTIL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/from"
-        android:inputType="text"
-        android:minHeight="48dp"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appTitleTextView"
-        app:layout_constraintVertical_bias="0.1" />
+        app:layout_constraintVertical_bias="0.05">
 
-    <AutoCompleteTextView
-        android:id="@+id/destACTV"
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/originACTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:ems="10"
+            android:hint="@string/from"
+            android:inputType="text"
+            android:minHeight="48dp"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/destTIL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/destination"
-        android:inputType="text"
-        android:minHeight="48dp"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/originACTV"
-        app:layout_constraintVertical_bias="0.1"/>
+        app:layout_constraintTop_toBottomOf="@+id/originTIL"
+        app:layout_constraintVertical_bias="0.05">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/destACTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:ems="10"
+            android:hint="@string/destination"
+            android:inputType="text"
+            android:minHeight="48dp"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         android:id="@+id/whenLinearLayout"
@@ -74,11 +71,12 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/destACTV"
-        app:layout_constraintVertical_bias="0.1">
+        app:layout_constraintTop_toBottomOf="@+id/destTIL"
+        app:layout_constraintVertical_bias="0.05">
 
         <Button
             android:id="@+id/dateButton"
@@ -193,32 +191,19 @@
         app:layout_constraintTop_toBottomOf="@+id/classRadioGroup"
         app:layout_constraintVertical_bias="0.1" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchButton"
-        app:layout_constraintVertical_bias="0.5">
-
-        <Button
-            android:id="@+id/loginOrTicketButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/placeholder" />
-
-        <Button
-            android:id="@+id/logoutButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="@string/logout" />
-    </LinearLayout>
-
     <include
         android:id="@+id/loading_spinner"
         layout="@layout/loading_spinner"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

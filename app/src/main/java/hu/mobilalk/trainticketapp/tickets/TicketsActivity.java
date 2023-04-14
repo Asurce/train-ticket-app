@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -16,7 +17,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 
 import hu.mobilalk.trainticketapp.LoginActivity;
+import hu.mobilalk.trainticketapp.MainActivity;
 import hu.mobilalk.trainticketapp.R;
+import hu.mobilalk.trainticketapp.SettingsActivity;
 
 public class TicketsActivity extends AppCompatActivity {
     private static final String LOG_TAG = TicketsAdapter.class.getName();
@@ -30,6 +33,9 @@ public class TicketsActivity extends AppCompatActivity {
     RecyclerView ticketsRV;
     ArrayList<TicketItem> ticketItemList;
     TicketsAdapter ticketsAdapter;
+
+    // BOTTOM NAV
+    BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +58,35 @@ public class TicketsActivity extends AppCompatActivity {
         ticketsRV.setLayoutManager(new LinearLayoutManager(this));
         ticketsRV.setAdapter(ticketsAdapter);
 
+        // BOTTOM NAV
+        bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.home:
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    return true;
+                case R.id.tickets:
+                    startActivity(new Intent(getApplicationContext(), TicketsActivity.class));
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    return true;
+                case R.id.settings:
+                    startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                    return true;
+                default:
+                    return true;
+            }
+        });
+        bottomNav.setOnItemReselectedListener(item -> {
+
+        });
+
         queryTickets();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bottomNav.setSelectedItemId(R.id.tickets);
     }
 
     private void queryTickets() {

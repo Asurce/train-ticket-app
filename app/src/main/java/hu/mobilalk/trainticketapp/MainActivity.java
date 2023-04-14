@@ -1,5 +1,6 @@
 package hu.mobilalk.trainticketapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -9,14 +10,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import hu.mobilalk.trainticketapp.routes.RouteItem;
 import hu.mobilalk.trainticketapp.routes.RoutesActivity;
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     // ANDROID
     SharedPreferences preferences;
-    Calendar calendar;
+    Calendar inputDate;
 
     // FIREBASE
     FirebaseAuth fireAuth;
@@ -47,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
     // CITY INPUT
     AutoCompleteTextView originACTV;
     AutoCompleteTextView destACTV;
-    ArrayAdapter<String> originAdapter;
-    ArrayAdapter<String> destAdapter;
+    ArrayAdapter<City> originAdapter;
+    ArrayAdapter<City> destAdapter;
     City originCity;
     City destCity;
     List<City> citiesList;
@@ -64,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     // BUTTONS
     Button searchButton;
-    Button loginOrTicketButton;
-    Button logoutButton;
+    BottomNavigationView bottomNav;
 
     // MISC
     View loadingSpinner;
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         // ANDROID
         preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
-        calendar = Calendar.getInstance();
+        inputDate = Calendar.getInstance();
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
@@ -93,75 +94,53 @@ public class MainActivity extends AppCompatActivity {
         originAdapter = new ArrayAdapter<>(
                 this,
                 com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
-                cityNamesList);
+                citiesList);
         originACTV.setAdapter(originAdapter);
         originACTV.setThreshold(1);
-        originACTV.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                originCity = citiesList.get(i);
-                Log.i(LOG_TAG, "Selected destination city: " + destCity.getName());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                originCity = null;
-                Log.i(LOG_TAG, "Selected destination city: NONE");
-            }
+        originACTV.setOnItemClickListener((adapterView, view, i, l) -> {
+            originCity = (City) adapterView.getItemAtPosition(i);
+            Log.i(LOG_TAG, "Selected start city: " + originCity);
         });
 
         destAdapter = new ArrayAdapter<>(
                 this,
                 com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
-                cityNamesList);
+                citiesList);
         destACTV.setAdapter(destAdapter);
         destACTV.setThreshold(1);
-        destACTV.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                destCity = citiesList.get(i);
-                Log.i(LOG_TAG, "Selected destination city: " + destCity.getName());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                destCity = null;
-                Log.i(LOG_TAG, "Selected destination city: NONE");
-            }
+        destACTV.setOnItemClickListener((adapterView, view, i, l) -> {
+            destCity = (City) adapterView.getItemAtPosition(i);
+            Log.i(LOG_TAG, "Selected start city: " + originCity);
         });
 
         // DATE INPUT
         dateButton = findViewById(R.id.dateButton);
         timeButton = findViewById(R.id.timeButton);
-        dateButton.setText(DateFormat.format("yyyy. MMMM. dd.", calendar.getTime()));
+        dateButton.setText(DateFormat.format("yyyy. MMMM. dd.", inputDate.getTime()));
         dateButton.setOnClickListener(view -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     this,
                     (datePicker, year, month, day) -> {
-                        calendar.set(year, month, day);
-                        dateButton.setText(DateFormat.format("yyyy. MMMM. dd.", calendar.getTime()));
+                        inputDate.set(year, month, day);
+                        dateButton.setText(DateFormat.format("yyyy. MMMM. dd.", inputDate.getTime()));
                     },
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)
+                    inputDate.get(Calendar.YEAR),
+                    inputDate.get(Calendar.MONTH),
+                    inputDate.get(Calendar.DAY_OF_MONTH)
             );
             datePickerDialog.show();
         });
-        timeButton.setText(DateFormat.format("HH:mm", calendar.getTime()));
+        timeButton.setText(DateFormat.format("HH:mm", inputDate.getTime()));
         timeButton.setOnClickListener(view -> {
             TimePickerDialog timePickerDialog = new TimePickerDialog(
                     this,
                     (timePicker, hour, minute) -> {
-                        calendar.set(
-                                calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH),
-                                calendar.get(Calendar.DAY_OF_MONTH),
-                                hour,
-                                minute);
-                        timeButton.setText(DateFormat.format("HH:mm", calendar.getTime()));
+                        inputDate.set(Calendar.HOUR, hour);
+                        inputDate.set(Calendar.MINUTE, minute);
+                        timeButton.setText(DateFormat.format("HH:mm", inputDate.getTime()));
                     },
-                    calendar.get(Calendar.HOUR),
-                    calendar.get(Calendar.MINUTE),
+                    inputDate.get(Calendar.HOUR),
+                    inputDate.get(Calendar.MINUTE),
                     true
             );
             timePickerDialog.show();
@@ -174,11 +153,29 @@ public class MainActivity extends AppCompatActivity {
         classRadioGroup.check(R.id.fastTrainRB);
 
         // BUTTONS
-        loginOrTicketButton = findViewById(R.id.loginOrTicketButton);
-        logoutButton = findViewById(R.id.logoutButton);
         searchButton = findViewById(R.id.searchButton);
-        logoutButton.setOnClickListener(this::logout);
         searchButton.setOnClickListener(this::search);
+
+        bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setOnItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.home:
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    return true;
+                case R.id.tickets:
+                    startActivity(new Intent(getApplicationContext(), TicketsActivity.class));
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    return true;
+                case R.id.settings:
+                    startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                    return true;
+                default:
+                    return true;
+            }
+        });
+        bottomNav.setOnItemReselectedListener(item -> {
+
+        });
 
         // MISC
         loadingSpinner = findViewById(R.id.loading_spinner);
@@ -191,25 +188,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (fireAuth.getCurrentUser() == null) {
-            loginOrTicketButton.setText(R.string.login);
-            loginOrTicketButton.setOnClickListener(this::login);
-        } else {
-            loginOrTicketButton.setText(getString(R.string.my_tickets));
-            loginOrTicketButton.setOnClickListener(this::tickets);
-        }
+
+        bottomNav.setSelectedItemId(R.id.home);
     }
 
     public void queryCities() {
         citiesCollection.get().addOnSuccessListener(queryDocumentSnapshots -> {
             queryDocumentSnapshots.forEach(document -> {
                 citiesList.add(new City(
-                        (String) document.get("name"),
-                        (Long) document.get("distance"),
-                        (Long) document.get("routeID")
+                        document.getString("name"),
+                        document.getLong("distance").intValue(),
+                        document.getLong("routeID").intValue()
                 ));
+                cityNamesList.add(document.getString("name"));
             });
-            cityNamesList = citiesList.stream().map(City::getName).collect(Collectors.toList());
             originAdapter.notifyDataSetChanged();
             destAdapter.notifyDataSetChanged();
 
@@ -225,21 +217,21 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Válassz különböző állomásokat!", Toast.LENGTH_SHORT).show();
         } else {
 
-            Log.i(LOG_TAG, calendar.getTime().toString());
+            Log.i(LOG_TAG, inputDate.getTime().toString());
 
-            Calendar arrive = Calendar.getInstance();
-            Long distance = 0L;
+            Calendar calcDate = Calendar.getInstance();
+            Integer distance;
 
             if (originCity.getRouteID() == 0) {
                 distance = destCity.getDistance();
-                arrive.setTimeInMillis(calendar.getTimeInMillis() + distance / 2 * 60000L);
+                calcDate.setTimeInMillis(inputDate.getTimeInMillis() + distance / 2 * 60000L);
             } else if (Objects.equals(originCity.getRouteID(), destCity.getRouteID())) {
                 distance = Math.abs(originCity.getDistance() - destCity.getDistance());
-                arrive.setTimeInMillis(calendar.getTimeInMillis() +
+                calcDate.setTimeInMillis(inputDate.getTimeInMillis() +
                         distance / 2 * 60000L);
             } else {
                 distance = originCity.getDistance() + destCity.getDistance();
-                arrive.setTimeInMillis((calendar.getTimeInMillis() +
+                calcDate.setTimeInMillis((inputDate.getTimeInMillis() +
                         distance / 2 * 60000L));
             }
 
@@ -247,27 +239,15 @@ public class MainActivity extends AppCompatActivity {
             searchIntent.putExtra("searchData", new RouteItem(
                     originCity.getName(),
                     destCity.getName(),
-                    calendar.getTime(),
-                    arrive.getTime(),
+                    inputDate.getTime(),
+                    calcDate.getTime(),
                     discountRadioGroup.indexOfChild(findViewById(discountRadioGroup.getCheckedRadioButtonId())),
                     classRadioGroup.indexOfChild(findViewById(classRadioGroup.getCheckedRadioButtonId())),
                     distance,
-                    (int)Math.log(distance)*150));
+                    (int)Math.log(distance)*700));
+            searchIntent.putExtra("isDepartDate", true);
             startActivity(searchIntent);
         }
-    }
-
-    public void login(View view) {
-        startActivity(new Intent(this, LoginActivity.class));
-    }
-
-    public void logout(View view) {
-        fireAuth.signOut();
-        Log.i(LOG_TAG, "SUCCESSFULLY LOGGED OUT!");
-
-
-        loginOrTicketButton.setText(R.string.login);
-        loginOrTicketButton.setOnClickListener(this::login);
     }
 
     public void tickets(View view) {
