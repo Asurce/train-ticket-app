@@ -5,25 +5,29 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import hu.mobilalk.trainticketapp.City;
 import hu.mobilalk.trainticketapp.MainActivity;
 import hu.mobilalk.trainticketapp.R;
+import hu.mobilalk.trainticketapp.enums.Comfort;
+import hu.mobilalk.trainticketapp.enums.Discount;
 
 public class RoutesActivity extends AppCompatActivity {
     private static final String LOG_TAG = RoutesActivity.class.getName();
     private static final String PREF_KEY = MainActivity.class.getPackage().toString();
 
     // ANDROID
+    Calendar referenceCalendar;
     Calendar inputDate;
-    Calendar calcDate;
 
     // LISTING
     RecyclerView routesRV;
     ArrayList<RouteItem> routesList;
-
     RoutesAdapter routesAdapter;
 
     // MISC
@@ -36,12 +40,9 @@ public class RoutesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_routes);
 
         // ANDROID, MISC
-        inputDate = Calendar.getInstance();
-        calcDate = Calendar.getInstance();
-        searchData = (RouteItem) getIntent().getSerializableExtra("searchData");
+        referenceCalendar = Calendar.getInstance();
+        inputDate = (Calendar) getIntent().getSerializableExtra("inputDate");
         isDepartDate = getIntent().getBooleanExtra("isDepartDate", true);
-        inputDate.setTime(searchData.getDepartTime());
-        calcDate.setTime(searchData.getArriveTime());
 
         // LISTING
         routesRV = findViewById(R.id.trainRecyclerView);
@@ -56,21 +57,35 @@ public class RoutesActivity extends AppCompatActivity {
     private void initializeData() {
         routesList.clear();
 
-        int day = inputDate.get(Calendar.DAY_OF_MONTH);
+        int travelTime = getIntent().getIntExtra("travelTime", 0);
+        int departFrequency = getIntent().getIntExtra("departFrequency", 1);
+        int departMinutes = getIntent().getIntExtra("departMinutes", 0);
 
-        while (inputDate.get(Calendar.DAY_OF_MONTH) < day+1) {
+        if (isDepartDate) {
+            referenceCalendar.setTime(inputDate.getTime());
+            referenceCalendar.set(Calendar.HOUR_OF_DAY, 23);
+            referenceCalendar.set(Calendar.MINUTE, 59);
+
+            inputDate.add(Calendar.HOUR_OF_DAY, inputDate.get(Calendar.MINUTE) < departMinutes ? 0 : 1);
+            inputDate.set(Calendar.MINUTE, departMinutes);
+        } else {
+            referenceCalendar.setTime(inputDate.getTime());
+            inputDate.set(Calendar.HOUR_OF_DAY, 2);
+            inputDate.set(Calendar.MINUTE, departMinutes);
+        }
+
+        while ((inputDate.getTimeInMillis() + (travelTime*60000L)) < referenceCalendar.getTimeInMillis()) {
             routesList.add(new RouteItem(
-                    searchData.getOriginCity(),
-                    searchData.getDestCity(),
+                    (City) getIntent().getSerializableExtra("originCity"),
+                    (City) getIntent().getSerializableExtra("destCity"),
                     inputDate.getTime(),
-                    calcDate.getTime(),
-                    searchData.getDiscount(),
-                    searchData.getComfort(),
-                    searchData.getDistance(),
-                    searchData.getPrice()
+                    new Date(inputDate.getTimeInMillis() + (travelTime*60000L)),
+                    (Discount) getIntent().getSerializableExtra("discount"),
+                    (Comfort) getIntent().getSerializableExtra("comfort"),
+                    getIntent().getIntExtra("distance", 0),
+                    getIntent().getIntExtra("price", 0)
                     ));
-            inputDate.set(Calendar.HOUR, inputDate.get(Calendar.HOUR)+1);
-            calcDate.set(Calendar.HOUR, calcDate.get(Calendar.HOUR)+1);
+            inputDate.setTimeInMillis(inputDate.getTimeInMillis() + (departFrequency * 60000L));
         }
 
         routesAdapter.notifyDataSetChanged();

@@ -1,17 +1,26 @@
 package hu.mobilalk.trainticketapp.tickets;
 
 public class TicketItem {
+
     private String originCity;
     private String destCity;
-    private int price;
-    private long date;
+    private Long departTime;
+    private Long arriveTime;
+    private Double discount;
+    private Integer comfort;
+    private Integer distance;
+    private Integer price;
     private String userID;
 
-    public TicketItem(String originCity, String destCity, int price, long date, String userID) {
+    public TicketItem(String originCity, String destCity, long departTime, long arriveTime, double discount, int comfort, Integer distance, Integer price, String userID) {
         this.originCity = originCity;
         this.destCity = destCity;
+        this.departTime = departTime;
+        this.arriveTime = arriveTime;
+        this.discount = discount;
+        this.comfort = comfort;
+        this.distance = distance;
         this.price = price;
-        this.date = date;
         this.userID = userID;
     }
 
@@ -31,20 +40,52 @@ public class TicketItem {
         this.destCity = destCity;
     }
 
-    public int getPrice() {
+    public Long getDepartTime() {
+        return departTime;
+    }
+
+    public void setDepartTime(Long departTime) {
+        this.departTime = departTime;
+    }
+
+    public Long getArriveTime() {
+        return arriveTime;
+    }
+
+    public void setArriveTime(Long arriveTime) {
+        this.arriveTime = arriveTime;
+    }
+
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    public Integer getComfort() {
+        return comfort;
+    }
+
+    public void setComfort(Integer comfort) {
+        this.comfort = comfort;
+    }
+
+    public Integer getDistance() {
+        return distance;
+    }
+
+    public void setDistance(Integer distance) {
+        this.distance = distance;
+    }
+
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
-    }
-
-    public long getDate() {
-        return date;
-    }
-
-    public void setDate(long date) {
-        this.date = date;
     }
 
     public String getUserID() {

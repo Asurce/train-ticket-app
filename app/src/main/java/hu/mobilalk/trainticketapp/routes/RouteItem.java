@@ -3,17 +3,24 @@ package hu.mobilalk.trainticketapp.routes;
 import java.io.Serializable;
 import java.util.Date;
 
+import hu.mobilalk.trainticketapp.City;
+import hu.mobilalk.trainticketapp.enums.Comfort;
+import hu.mobilalk.trainticketapp.enums.Discount;
+
 public class RouteItem implements Serializable {
-    private String originCity;
-    private String destCity;
+    private City originCity;
+    private City destCity;
     private Date departTime;
     private Date arriveTime;
-    private Integer discount;
-    private Integer comfort;
+    private Discount discount;
+    private Comfort comfort;
     private Integer distance;
     private Integer price;
 
-    public RouteItem(String originCity, String destCity, Date departTime, Date arriveTime, Integer discount, Integer comfort, Integer distance, Integer price) {
+    public RouteItem() {
+    }
+
+    public RouteItem(City originCity, City destCity, Date departTime, Date arriveTime, Discount discount, Comfort comfort, Integer distance, Integer price) {
         this.originCity = originCity;
         this.destCity = destCity;
         this.departTime = departTime;
@@ -24,19 +31,19 @@ public class RouteItem implements Serializable {
         this.price = price;
     }
 
-    public String getOriginCity() {
+    public City getOriginCity() {
         return originCity;
     }
 
-    public void setOriginCity(String originCity) {
+    public void setOriginCity(City originCity) {
         this.originCity = originCity;
     }
 
-    public String getDestCity() {
+    public City getDestCity() {
         return destCity;
     }
 
-    public void setDestCity(String destCity) {
+    public void setDestCity(City destCity) {
         this.destCity = destCity;
     }
 
@@ -56,19 +63,19 @@ public class RouteItem implements Serializable {
         this.arriveTime = arriveTime;
     }
 
-    public Integer getDiscount() {
+    public Discount getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Integer discount) {
+    public void setDiscount(Discount discount) {
         this.discount = discount;
     }
 
-    public Integer getComfort() {
+    public Comfort getComfort() {
         return comfort;
     }
 
-    public void setComfort(Integer comfort) {
+    public void setComfort(Comfort comfort) {
         this.comfort = comfort;
     }
 

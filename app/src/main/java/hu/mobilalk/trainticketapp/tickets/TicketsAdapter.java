@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import hu.mobilalk.trainticketapp.R;
 
@@ -74,7 +75,7 @@ public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHold
         }
 
         public void bindTo(TicketItem currentItem) {
-            calendar.setTimeInMillis(currentItem.getDate());
+            calendar.setTimeInMillis(currentItem.getDepartTime());
             time.setText(DateFormat.format("HH:mm",calendar.getTime()));
             city.setText(currentItem.getOriginCity() + " ---> " + currentItem.getDestCity());
             price.setText(currentItem.getPrice() + "Ft");

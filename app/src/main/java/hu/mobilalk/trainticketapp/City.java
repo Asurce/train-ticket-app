@@ -2,7 +2,9 @@ package hu.mobilalk.trainticketapp;
 
 import androidx.annotation.NonNull;
 
-public class City {
+import java.io.Serializable;
+
+public class City implements Serializable {
     private String name;
     private Integer distance;
     private Integer routeID;

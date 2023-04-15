@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    android:layout_margin="8dp"
+    style="@style/Widget.Material3.CardView.Filled">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -79,7 +80,7 @@
             android:layout_height="wrap_content"
             android:text="@string/placeholder"
             android:drawableLeft="@drawable/cart"
-            android:drawableTint="@color/white"
+            android:drawableTint="@color/cardview_light_background"
             android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>

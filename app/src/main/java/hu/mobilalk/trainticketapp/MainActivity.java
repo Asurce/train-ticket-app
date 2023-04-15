@@ -1,6 +1,5 @@
 package hu.mobilalk.trainticketapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -10,7 +9,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -19,17 +17,19 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import hu.mobilalk.trainticketapp.routes.RouteItem;
+import hu.mobilalk.trainticketapp.enums.Comfort;
+import hu.mobilalk.trainticketapp.enums.Discount;
 import hu.mobilalk.trainticketapp.routes.RoutesActivity;
 import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
 
@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     // ANDROID
     SharedPreferences preferences;
     Calendar inputDate;
+    Calendar currentDate;
 
     // FIREBASE
     FirebaseAuth fireAuth;
@@ -54,30 +55,33 @@ public class MainActivity extends AppCompatActivity {
     City originCity;
     City destCity;
     List<City> citiesList;
-    List<String> cityNamesList;
 
     // DATE INPUT
     Button dateButton;
     Button timeButton;
 
     // OTHER INPUT
+    RadioGroup isDepartDateRadioGroup;
     RadioGroup discountRadioGroup;
-    RadioGroup classRadioGroup;
+    RadioGroup comfortRadioGroup;
 
     // BUTTONS
     Button searchButton;
-    BottomNavigationView bottomNav;
 
     // MISC
     View loadingSpinner;
+    BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.i(LOG_TAG, "ON CREATE MAIN");
+
         // ANDROID
         preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
+        currentDate = Calendar.getInstance();
         inputDate = Calendar.getInstance();
 
         // FIREBASE
@@ -89,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         originACTV = findViewById(R.id.originACTV);
         destACTV = findViewById(R.id.destACTV);
         citiesList = new ArrayList<>();
-        cityNamesList = new ArrayList<>();
 
         originAdapter = new ArrayAdapter<>(
                 this,
@@ -97,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
                 citiesList);
         originACTV.setAdapter(originAdapter);
         originACTV.setThreshold(1);
+        originACTV.setOnFocusChangeListener((view, b) -> originACTV.showDropDown());
+        originACTV.setOnClickListener(view -> originACTV.showDropDown());
         originACTV.setOnItemClickListener((adapterView, view, i, l) -> {
             originCity = (City) adapterView.getItemAtPosition(i);
             Log.i(LOG_TAG, "Selected start city: " + originCity);
@@ -108,6 +113,8 @@ public class MainActivity extends AppCompatActivity {
                 citiesList);
         destACTV.setAdapter(destAdapter);
         destACTV.setThreshold(1);
+        destACTV.setOnFocusChangeListener((view, b) -> destACTV.showDropDown());
+        destACTV.setOnClickListener(view -> destACTV.showDropDown());
         destACTV.setOnItemClickListener((adapterView, view, i, l) -> {
             destCity = (City) adapterView.getItemAtPosition(i);
             Log.i(LOG_TAG, "Selected start city: " + originCity);
@@ -135,11 +142,11 @@ public class MainActivity extends AppCompatActivity {
             TimePickerDialog timePickerDialog = new TimePickerDialog(
                     this,
                     (timePicker, hour, minute) -> {
-                        inputDate.set(Calendar.HOUR, hour);
+                        inputDate.set(Calendar.HOUR_OF_DAY, hour);
                         inputDate.set(Calendar.MINUTE, minute);
                         timeButton.setText(DateFormat.format("HH:mm", inputDate.getTime()));
                     },
-                    inputDate.get(Calendar.HOUR),
+                    inputDate.get(Calendar.HOUR_OF_DAY),
                     inputDate.get(Calendar.MINUTE),
                     true
             );
@@ -147,16 +154,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // OTHER INPUT
+        isDepartDateRadioGroup = findViewById(R.id.isDepartDateRadioGroup);
+        isDepartDateRadioGroup.check(R.id.depart);
         discountRadioGroup = findViewById(R.id.discountRadioGroup);
-        classRadioGroup = findViewById(R.id.classRadioGroup);
         discountRadioGroup.check(R.id.noDiscountRB);
-        classRadioGroup.check(R.id.fastTrainRB);
+        comfortRadioGroup = findViewById(R.id.comfortRadioGroup);
+        comfortRadioGroup.check(R.id.fastTrainRB);
 
         // BUTTONS
         searchButton = findViewById(R.id.searchButton);
         searchButton.setOnClickListener(this::search);
 
         bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.home);
         bottomNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.home:
@@ -167,14 +177,13 @@ public class MainActivity extends AppCompatActivity {
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 case R.id.settings:
-                    startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                     return true;
                 default:
                     return true;
             }
         });
         bottomNav.setOnItemReselectedListener(item -> {
-
         });
 
         // MISC
@@ -182,25 +191,27 @@ public class MainActivity extends AppCompatActivity {
         loadingSpinner.setVisibility(View.VISIBLE);
 
         queryCities();
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        Log.i(LOG_TAG, "ON RESUME MAIN");
+        Log.i(LOG_TAG, currentDate.getTime().toString());
+
         bottomNav.setSelectedItemId(R.id.home);
     }
 
     public void queryCities() {
         citiesCollection.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            citiesList.clear();
             queryDocumentSnapshots.forEach(document -> {
                 citiesList.add(new City(
                         document.getString("name"),
                         document.getLong("distance").intValue(),
                         document.getLong("routeID").intValue()
                 ));
-                cityNamesList.add(document.getString("name"));
             });
             originAdapter.notifyDataSetChanged();
             destAdapter.notifyDataSetChanged();
@@ -211,46 +222,89 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void search(View view) {
+
+        // DATE TYPE
+        boolean isDepartDate = isDepartDateRadioGroup.getCheckedRadioButtonId() == R.id.depart;
+
+        // CHECK DATA
         if (originCity == null || destCity == null) {
             Toast.makeText(this, "Mindkét állomást ki kell választani!", Toast.LENGTH_SHORT).show();
+            return;
         } else if (originCity.equals(destCity)) {
             Toast.makeText(this, "Válassz különböző állomásokat!", Toast.LENGTH_SHORT).show();
-        } else {
-
-            Log.i(LOG_TAG, inputDate.getTime().toString());
-
-            Calendar calcDate = Calendar.getInstance();
-            Integer distance;
-
-            if (originCity.getRouteID() == 0) {
-                distance = destCity.getDistance();
-                calcDate.setTimeInMillis(inputDate.getTimeInMillis() + distance / 2 * 60000L);
-            } else if (Objects.equals(originCity.getRouteID(), destCity.getRouteID())) {
-                distance = Math.abs(originCity.getDistance() - destCity.getDistance());
-                calcDate.setTimeInMillis(inputDate.getTimeInMillis() +
-                        distance / 2 * 60000L);
-            } else {
-                distance = originCity.getDistance() + destCity.getDistance();
-                calcDate.setTimeInMillis((inputDate.getTimeInMillis() +
-                        distance / 2 * 60000L));
-            }
-
-            Intent searchIntent = new Intent(this, RoutesActivity.class);
-            searchIntent.putExtra("searchData", new RouteItem(
-                    originCity.getName(),
-                    destCity.getName(),
-                    inputDate.getTime(),
-                    calcDate.getTime(),
-                    discountRadioGroup.indexOfChild(findViewById(discountRadioGroup.getCheckedRadioButtonId())),
-                    classRadioGroup.indexOfChild(findViewById(classRadioGroup.getCheckedRadioButtonId())),
-                    distance,
-                    (int)Math.log(distance)*700));
-            searchIntent.putExtra("isDepartDate", true);
-            startActivity(searchIntent);
+            return;
+        } else if (
+                (!isDepartDate && currentDate.after(inputDate))
+                || (isDepartDate && inputDate.before(currentDate))) {
+            Toast.makeText(this, "A választott idő már lejárt!", Toast.LENGTH_SHORT).show();
+            return;
         }
-    }
 
-    public void tickets(View view) {
-        startActivity(new Intent(this, TicketsActivity.class));
+        // DISTANCE
+        int distance;
+        if (originCity.getRouteID() == 0) {
+            distance = destCity.getDistance();
+        } else if (Objects.equals(originCity.getRouteID(), destCity.getRouteID())) {
+            distance = Math.abs(originCity.getDistance() - destCity.getDistance());
+        } else {
+            distance = originCity.getDistance() + destCity.getDistance();
+        }
+
+        // TRAVEL TIME
+        int travelTime = distance/2;
+
+        // DEPART FREQUENCY
+        int departFrequency = 60/(originCity.getRouteID() == 0 ? destCity.getRouteID() : originCity.getRouteID());
+
+        // DEPART MINUTES
+        int departMinutes = (int) Math.abs(Math.sin(distance) * 59);
+
+        // COMFORT
+        Map<Integer, Comfort> comfortMap = new HashMap<>();
+        comfortMap.put(R.id.fastTrainRB, Comfort.FAST_TRAIN);
+        comfortMap.put(R.id.secondClassRB, Comfort.SECOND_CLASS);
+        comfortMap.put(R.id.firstClassRB, Comfort.FIRST_CLASS);
+
+        Comfort comfort = comfortMap.get(comfortRadioGroup.getCheckedRadioButtonId());
+
+        // DISCOUNT
+        Map<Integer, Discount> discountMap = new HashMap<>();
+        discountMap.put(R.id.noDiscountRB, Discount.NONE);
+        discountMap.put(R.id.fiftyDiscountRB, Discount.STUDENT);
+        discountMap.put(R.id.ninetyDiscountRB, Discount.WORKER);
+
+        Discount discount = discountMap.get(discountRadioGroup.getCheckedRadioButtonId());
+
+        // PRICE
+        int price = (int) ((Math.log(distance) * 500 + comfort.getValue()) * discount.getValue());
+
+        // INTENT
+        Intent searchIntent = new Intent(this, RoutesActivity.class);
+        searchIntent.putExtra("originCity", originCity);
+        searchIntent.putExtra("destCity", destCity);
+        searchIntent.putExtra("inputDate", inputDate);
+        searchIntent.putExtra("isDepartDate", isDepartDate);
+        searchIntent.putExtra("distance", distance);
+        searchIntent.putExtra("travelTime", travelTime);
+        searchIntent.putExtra("departFrequency", departFrequency);
+        searchIntent.putExtra("departMinutes", departMinutes);
+        searchIntent.putExtra("comfort", comfort);
+        searchIntent.putExtra("discount", discount);
+        searchIntent.putExtra("price", price);
+
+        // originCity
+        // destCity
+        // inputDate
+        // isDepartDate
+        // distance
+        // travelTime
+        // departFrequency
+        // departMinutes
+        // comfort
+        // discount
+        // price
+
+        startActivity(searchIntent);
+
     }
 }

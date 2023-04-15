@@ -84,21 +84,39 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
 
         public void bindTo(RouteItem currentItem) {
             departTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getDepartTime()));
-            originCityTextView.setText(currentItem.getOriginCity());
+            originCityTextView.setText(currentItem.getOriginCity().getName());
             arriveTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getArriveTime()));
-            destCityTextView.setText(currentItem.getDestCity());
+            destCityTextView.setText(currentItem.getDestCity().getName());
             buyButton.setOnClickListener(view -> buy(view, currentItem));
             buyButton.setText(currentItem.getPrice() + "Ft");
         }
 
         public void buy(View view, RouteItem item) {
-//            ticketsCollection.add(new TicketItem(
-//                    item.getOriginCity(),
-//                    item.getDestCity(),
-//                    2500,
-//                    item.getDate().getTime(),
-//                    fireAuth.getCurrentUser().getUid()));
-            view.getContext().startActivity(new Intent(view.getContext(), PurchaseActivity.class));
+
+            // originCity
+            // destCity
+            // departDate
+            // arriveDate
+            // distance
+            // travelTime
+            // comfort
+            // discount
+            // price
+            // userID
+
+            ticketsCollection.add(new TicketItem(
+                    item.getOriginCity().getName(),
+                    item.getDestCity().getName(),
+                    item.getDepartTime().getTime(),
+                    item.getArriveTime().getTime(),
+                    item.getDiscount().getValue(),
+                    item.getComfort().getValue(),
+                    item.getDistance(),
+                    item.getPrice(),
+                    fireAuth.getUid()
+            ));
+
+            view.getContext().startActivity(new Intent(view.getContext(), TicketsActivity.class));
         }
     }
 
