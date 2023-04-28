@@ -19,4 +19,7 @@
     <string name="home_menu">Főmenü</string>
     <string name="tickets_menu">Jegyeim</string>
     <string name="settings_menu">Beállítások</string>
+    <string name="routes">Útvonalak</string>
+    <string name="download">Letöltés</string>
+    <string name="ticket_details">Vonatjegy</string>
 </resources>

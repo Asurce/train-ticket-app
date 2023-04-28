@@ -8,23 +8,22 @@ import hu.mobilalk.trainticketapp.enums.Comfort;
 import hu.mobilalk.trainticketapp.enums.Discount;
 
 public class RouteItem implements Serializable {
-    private City originCity;
-    private City destCity;
-    private Date departTime;
-    private Date arriveTime;
-    private Discount discount;
-    private Comfort comfort;
-    private Integer distance;
-    private Integer price;
+    private final City originCity;
+    private final City destCity;
+    private final Date departTime;
+    private final Date arriveTime;
+    private final Integer travelTime;
+    private final Discount discount;
+    private final Comfort comfort;
+    private final Integer distance;
+    private final Integer price;
 
-    public RouteItem() {
-    }
-
-    public RouteItem(City originCity, City destCity, Date departTime, Date arriveTime, Discount discount, Comfort comfort, Integer distance, Integer price) {
+    public RouteItem(City originCity, City destCity, Date departTime, Date arriveTime, Integer travelTime, Discount discount, Comfort comfort, Integer distance, Integer price) {
         this.originCity = originCity;
         this.destCity = destCity;
         this.departTime = departTime;
         this.arriveTime = arriveTime;
+        this.travelTime = travelTime;
         this.discount = discount;
         this.comfort = comfort;
         this.distance = distance;
@@ -35,63 +34,35 @@ public class RouteItem implements Serializable {
         return originCity;
     }
 
-    public void setOriginCity(City originCity) {
-        this.originCity = originCity;
-    }
-
     public City getDestCity() {
         return destCity;
-    }
-
-    public void setDestCity(City destCity) {
-        this.destCity = destCity;
     }
 
     public Date getDepartTime() {
         return departTime;
     }
 
-    public void setDepartTime(Date departTime) {
-        this.departTime = departTime;
-    }
-
     public Date getArriveTime() {
         return arriveTime;
     }
 
-    public void setArriveTime(Date arriveTime) {
-        this.arriveTime = arriveTime;
+    public Integer getTravelTime() {
+        return travelTime;
     }
 
     public Discount getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Discount discount) {
-        this.discount = discount;
-    }
-
     public Comfort getComfort() {
         return comfort;
-    }
-
-    public void setComfort(Comfort comfort) {
-        this.comfort = comfort;
     }
 
     public Integer getDistance() {
         return distance;
     }
 
-    public void setDistance(Integer distance) {
-        this.distance = distance;
-    }
-
     public Integer getPrice() {
         return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
     }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.TrainTicketApp" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.TrainTicketApp" parent="Theme.Material3.Light">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
@@ -26,8 +26,28 @@
         <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
+
+<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
+<!--        <item name="android:windowLightStatusBar">true</item>-->
+
+        <item name="actionBarStyle">@style/ThemeActionBar</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Material3.Corner.Medium</item>
+        <item name="materialCardViewStyle">@style/Widget.Material3.CardView.Filled.Variant</item>
+
+<!--        <item name="actionBarStyle">@style/ThemeActionBar</item>-->
+<!--        <item name="android:windowActionBarOverlay">true</item>-->
+
+<!--        <item name="materialButtonStyle">@style/Widget.Material3.Button.Variant</item>-->
+    </style>
+    <style name="Widget.Material3.Button.Variant" parent="Widget.Material3.Button">
+        <item name="cornerRadius">10dp</item>
     </style>
     <style name="Widget.Material3.CardView.Filled.Variant" parent="Widget.Material3.CardView.Filled">
-        <item name="cardBackgroundColor">@color/material_dynamic_primary0</item>
+<!--        <item name="cardBackgroundColor">@color/md_theme_light_onPrimary</item>-->
+    </style>
+
+    <style name="ThemeActionBar" parent="Widget.Material3.Light.ActionBar.Solid">
+        <item name="android:background">@color/md_theme_light_background</item>
+        <item name="background">@color/md_theme_light_background</item>
     </style>
 </resources>

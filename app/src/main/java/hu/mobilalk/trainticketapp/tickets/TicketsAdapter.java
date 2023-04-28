@@ -1,6 +1,7 @@
 package hu.mobilalk.trainticketapp.tickets;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import hu.mobilalk.trainticketapp.MainActivity;
 import hu.mobilalk.trainticketapp.R;
 
 public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHolder> {
@@ -59,26 +61,33 @@ public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHold
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        // TODO TICKET FIELDS
-        TextView time;
-        TextView city;
-        TextView price;
-
+        TextView timeTextView;
+        TextView dateTextView;
+        TextView originCityTextView;
+        TextView destCityTextView;
         Calendar calendar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            time = itemView.findViewById(R.id.timeTextView);
-            city = itemView.findViewById(R.id.cityTextView);
-            price = itemView.findViewById(R.id.priceTextView);
+            timeTextView = itemView.findViewById(R.id.timeTextView);
+            dateTextView = itemView.findViewById(R.id.dateTextView);
+            originCityTextView = itemView.findViewById(R.id.originCityTextView);
+            destCityTextView = itemView.findViewById(R.id.destCityTextView);
             calendar = Calendar.getInstance();
         }
 
         public void bindTo(TicketItem currentItem) {
             calendar.setTimeInMillis(currentItem.getDepartTime());
-            time.setText(DateFormat.format("HH:mm",calendar.getTime()));
-            city.setText(currentItem.getOriginCity() + " ---> " + currentItem.getDestCity());
-            price.setText(currentItem.getPrice() + "Ft");
+            timeTextView.setText(DateFormat.format("HH:mm",calendar.getTime()));
+            dateTextView.setText(DateFormat.format("yyyy. MM. dd",calendar.getTime()));
+            originCityTextView.setText(currentItem.getOriginCity());
+            destCityTextView.setText(currentItem.getDestCity());
+
+            itemView.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(), TicketDetailsActivity.class);
+                intent.putExtra("ticketData", currentItem);
+                view.getContext().startActivity(intent);
+            });
         }
     }
 

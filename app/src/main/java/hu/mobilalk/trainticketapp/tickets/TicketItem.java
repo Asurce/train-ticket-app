@@ -1,22 +1,26 @@
 package hu.mobilalk.trainticketapp.tickets;
 
-public class TicketItem {
+import java.io.Serializable;
+
+public class TicketItem implements Serializable {
 
     private String originCity;
     private String destCity;
     private Long departTime;
     private Long arriveTime;
-    private Double discount;
-    private Integer comfort;
+    private Integer travelTime;
+    private String discount;
+    private String comfort;
     private Integer distance;
     private Integer price;
     private String userID;
 
-    public TicketItem(String originCity, String destCity, long departTime, long arriveTime, double discount, int comfort, Integer distance, Integer price, String userID) {
+    public TicketItem(String originCity, String destCity, Long departTime, Long arriveTime, Integer travelTime, String discount, String comfort, Integer distance, Integer price, String userID) {
         this.originCity = originCity;
         this.destCity = destCity;
         this.departTime = departTime;
         this.arriveTime = arriveTime;
+        this.travelTime = travelTime;
         this.discount = discount;
         this.comfort = comfort;
         this.distance = distance;
@@ -56,19 +60,27 @@ public class TicketItem {
         this.arriveTime = arriveTime;
     }
 
-    public Double getDiscount() {
+    public Integer getTravelTime() {
+        return travelTime;
+    }
+
+    public void setTravelTime(Integer travelTime) {
+        this.travelTime = travelTime;
+    }
+
+    public String getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Double discount) {
+    public void setDiscount(String discount) {
         this.discount = discount;
     }
 
-    public Integer getComfort() {
+    public String getComfort() {
         return comfort;
     }
 
-    public void setComfort(Integer comfort) {
+    public void setComfort(String comfort) {
         this.comfort = comfort;
     }
 

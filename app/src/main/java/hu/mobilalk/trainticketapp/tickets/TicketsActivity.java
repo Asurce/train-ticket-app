@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +29,8 @@ import hu.mobilalk.trainticketapp.LoginActivity;
 import hu.mobilalk.trainticketapp.MainActivity;
 import hu.mobilalk.trainticketapp.R;
 import hu.mobilalk.trainticketapp.SettingsActivity;
+import hu.mobilalk.trainticketapp.enums.Comfort;
+import hu.mobilalk.trainticketapp.enums.Discount;
 
 public class TicketsActivity extends AppCompatActivity {
     private static final String LOG_TAG = TicketsAdapter.class.getName();
@@ -45,6 +49,9 @@ public class TicketsActivity extends AppCompatActivity {
     // BOTTOM NAV
     BottomNavigationView bottomNav;
 
+    // MISC
+    Button loginButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,10 +65,6 @@ public class TicketsActivity extends AppCompatActivity {
                 .build();
         fireStore.setFirestoreSettings(settings);
         ticketsCollection = fireStore.collection("tickets");
-
-        if (fireAuth.getCurrentUser() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-        }
 
         // LISTING
         ticketsRV = findViewById(R.id.ticketRecyclerView);
@@ -92,12 +95,25 @@ public class TicketsActivity extends AppCompatActivity {
         bottomNav.setOnItemReselectedListener(item -> {
 
         });
+
+        // MISC
+        loginButton = findViewById(R.id.loginButton);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        queryTickets();
+        if (fireAuth.getCurrentUser() == null) {
+            ticketsRV.setVisibility(View.GONE);
+            loginButton.setVisibility(View.VISIBLE);
+            loginButton.setOnClickListener(view -> {
+                startActivity(new Intent(this, LoginActivity.class));
+            });
+        } else {
+            ticketsRV.setVisibility(View.VISIBLE);
+            loginButton.setVisibility(View.GONE);
+            queryTickets();
+        }
         bottomNav.setSelectedItemId(R.id.tickets);
     }
 
@@ -106,15 +122,16 @@ public class TicketsActivity extends AppCompatActivity {
             ticketItemList.clear();
             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                 ticketItemList.add(new TicketItem(
-                        document.get("originCity").toString(),
-                        document.get("destCity").toString(),
+                        document.getString("originCity"),
+                        document.getString("destCity"),
                         document.getLong("departTime"),
                         document.getLong("arriveTime"),
-                        document.getLong("discount"),
-                        document.getLong("comfort").intValue(),
+                        document.getLong("travelTime").intValue(),
+                        document.getString("discount"),
+                        document.getString("comfort"),
                         document.getLong("distance").intValue(),
-                        Integer.parseInt(document.get("price").toString()),
-                        document.get("userID").toString()
+                        document.getLong("price").intValue(),
+                        document.getString("userID")
                 ));
             }
             ticketsAdapter.notifyDataSetChanged();

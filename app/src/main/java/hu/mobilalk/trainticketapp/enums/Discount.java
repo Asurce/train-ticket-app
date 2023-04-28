@@ -14,4 +14,14 @@ public enum Discount {
     public double getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        switch (this) {
+            case NONE: return "Teljes árú jegy";
+            case STUDENT: return "50% kedvezmény";
+            case WORKER: return "90% kedvezmény";
+            default: return "";
+        }
+    }
 }

@@ -152,7 +152,7 @@
     </RadioGroup>
 
     <TextView
-        android:id="@+id/discountTextView"
+        android:id="@+id/discountMainTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/discounts"
@@ -171,7 +171,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/discountTextView"
+        app:layout_constraintTop_toBottomOf="@+id/discountMainTextView"
         app:layout_constraintVertical_bias="0.0">
 
         <RadioButton

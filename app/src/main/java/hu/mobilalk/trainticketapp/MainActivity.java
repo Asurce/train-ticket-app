@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i(LOG_TAG, "ON CREATE MAIN");
 
+        getSupportActionBar().hide();
+
         // ANDROID
         preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
         currentDate = Calendar.getInstance();
@@ -177,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 case R.id.settings:
-                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
                     return true;
                 default:
                     return true;

@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +18,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
-import hu.mobilalk.trainticketapp.PurchaseActivity;
 import hu.mobilalk.trainticketapp.R;
 import hu.mobilalk.trainticketapp.tickets.TicketItem;
 import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
@@ -66,29 +64,40 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        // TODO ROUTE FIELDS
-        TextView departTimeTextView;
         TextView originCityTextView;
-        TextView arriveTimeTextView;
         TextView destCityTextView;
-        Button buyButton;
+        TextView departTimeTextView;
+        TextView arriveTimeTextView;
+        TextView travelTimeTextView;
+        TextView distanceTextView;
+        TextView comfortTextView;
+        TextView discountTextView;
+        Button purchaseButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            departTimeTextView = itemView.findViewById(R.id.departTimeTextView);
             originCityTextView = itemView.findViewById(R.id.originCityTextView);
-            arriveTimeTextView = itemView.findViewById(R.id.arriveTimeTextView);
             destCityTextView = itemView.findViewById(R.id.destCityTextView);
-            buyButton = itemView.findViewById(R.id.buyButton);
+            departTimeTextView = itemView.findViewById(R.id.departTimeTextView);
+            arriveTimeTextView = itemView.findViewById(R.id.arriveTimeTextView);
+            travelTimeTextView = itemView.findViewById(R.id.travelTimeTextView);
+            distanceTextView = itemView.findViewById(R.id.distanceTextView);
+            comfortTextView = itemView.findViewById(R.id.comfortTextView);
+            discountTextView = itemView.findViewById(R.id.discountTextView);
+            purchaseButton = itemView.findViewById(R.id.purchaseButton);
         }
 
         public void bindTo(RouteItem currentItem) {
-            departTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getDepartTime()));
             originCityTextView.setText(currentItem.getOriginCity().getName());
-            arriveTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getArriveTime()));
             destCityTextView.setText(currentItem.getDestCity().getName());
-            buyButton.setOnClickListener(view -> buy(view, currentItem));
-            buyButton.setText(currentItem.getPrice() + "Ft");
+            departTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getDepartTime()));
+            arriveTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getArriveTime()));
+            travelTimeTextView.setText(currentItem.getTravelTime() + " perc");
+            distanceTextView.setText(currentItem.getDistance() + " km");
+            comfortTextView.setText(currentItem.getComfort().toString());
+            discountTextView.setText(currentItem.getDiscount().toString());
+            purchaseButton.setOnClickListener(view -> buy(view, currentItem));
+            purchaseButton.setText(currentItem.getPrice() + "Ft");
         }
 
         public void buy(View view, RouteItem item) {
@@ -109,8 +118,9 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
                     item.getDestCity().getName(),
                     item.getDepartTime().getTime(),
                     item.getArriveTime().getTime(),
-                    item.getDiscount().getValue(),
-                    item.getComfort().getValue(),
+                    item.getTravelTime(),
+                    item.getDiscount().toString(),
+                    item.getComfort().toString(),
                     item.getDistance(),
                     item.getPrice(),
                     fireAuth.getUid()

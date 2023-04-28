@@ -14,4 +14,14 @@ public enum Comfort {
     public int getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        switch (this) {
+            case FAST_TRAIN: return "Gyorsvonat";
+            case SECOND_CLASS: return "2. osztály";
+            case FIRST_CLASS: return "1. osztály";
+            default: return "";
+        }
+    }
 }
