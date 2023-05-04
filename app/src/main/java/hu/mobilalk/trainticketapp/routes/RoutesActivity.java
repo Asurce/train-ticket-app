@@ -1,22 +1,39 @@
 package hu.mobilalk.trainticketapp.routes;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 
-import hu.mobilalk.trainticketapp.City;
-import hu.mobilalk.trainticketapp.MainActivity;
+import hu.mobilalk.trainticketapp.NotificationHelper;
+import hu.mobilalk.trainticketapp.models.City;
+import hu.mobilalk.trainticketapp.LoginActivity;
 import hu.mobilalk.trainticketapp.R;
 import hu.mobilalk.trainticketapp.enums.Comfort;
 import hu.mobilalk.trainticketapp.enums.Discount;
+import hu.mobilalk.trainticketapp.tickets.TicketItem;
+import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
 
 public class RoutesActivity extends AppCompatActivity {
     private static final String LOG_TAG = RoutesActivity.class.getName();
@@ -24,6 +41,12 @@ public class RoutesActivity extends AppCompatActivity {
     // ANDROID
     Calendar referenceCalendar;
     Calendar inputDate;
+    NotificationHelper notificationHelper;
+
+    // FIREBASE
+    FirebaseAuth fireAuth;
+    FirebaseFirestore firestore;
+    CollectionReference ticketsCollection;
 
     // LISTING
     RecyclerView routesRV;
@@ -32,6 +55,9 @@ public class RoutesActivity extends AppCompatActivity {
 
     // MISC
     boolean isDepartDate;
+
+    ActivityResultLauncher<Intent> loginLauncher;
+    TicketItem ticketToBuy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,20 +68,37 @@ public class RoutesActivity extends AppCompatActivity {
         referenceCalendar = Calendar.getInstance();
         inputDate = (Calendar) getIntent().getSerializableExtra("inputDate");
         isDepartDate = getIntent().getBooleanExtra("isDepartDate", true);
+        notificationHelper = new NotificationHelper(this);
         if (inputDate == null) finish();
+
+        // FIREBASE
+        fireAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
+        ticketsCollection = firestore.collection("tickets");
 
         // LISTING
         routesRV = findViewById(R.id.trainRecyclerView);
         routesList = new ArrayList<>();
+        initializeData();
         routesAdapter = new RoutesAdapter(this, routesList);
         routesRV.setLayoutManager(new LinearLayoutManager(this));
         routesRV.setAdapter(routesAdapter);
 
         // ACTION BAR
-        getSupportActionBar().setTitle(R.string.routes);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.routes);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        initializeData();
+        // WAIT FOR LOGIN
+        loginLauncher =
+                registerForActivityResult(
+                        new ActivityResultContracts.StartActivityForResult(), (result) -> {
+                            if (fireAuth.getCurrentUser() != null) {
+                                ticketToBuy.setUserID(fireAuth.getUid());
+                                ticketsCollection.add(ticketToBuy);
+                                notificationHelper.send("Sikeres vásárlás!");
+                                startActivity(new Intent(this, TicketsActivity.class));
+                            }
+                        });
     }
 
     private void initializeData() {
@@ -95,9 +138,17 @@ public class RoutesActivity extends AppCompatActivity {
             inputDate.setTimeInMillis(inputDate.getTimeInMillis() + (departFrequency * 60000L));
         }
 
-        routesAdapter.notifyDataSetChanged();
-
         Log.i(LOG_TAG, "SUCCESSFULLY generated all route items!");
+    }
+
+    public void purchaseTicket() {
+        if (fireAuth.getCurrentUser() == null) {
+            loginLauncher.launch(new Intent(this, LoginActivity.class));
+        } else {
+            ticketsCollection.add(ticketToBuy);
+            notificationHelper.send("Sikeres vásárlás!");
+            startActivity(new Intent(this, TicketsActivity.class));
+        }
     }
 
     @Override
@@ -107,5 +158,9 @@ public class RoutesActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setTicketToBuy(TicketItem ticketToBuy) {
+        this.ticketToBuy = ticketToBuy;
     }
 }

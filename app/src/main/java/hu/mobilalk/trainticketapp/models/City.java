@@ -1,4 +1,4 @@
-package hu.mobilalk.trainticketapp;
+package hu.mobilalk.trainticketapp.models;
 
 import androidx.annotation.NonNull;
 

@@ -14,6 +14,7 @@ public class TicketItem implements Serializable {
     private Integer distance;
     private Integer price;
     private String userID;
+    private String ticketID;
 
     public TicketItem(String originCity, String destCity, Long departTime, Long arriveTime, Integer travelTime, String discount, String comfort, Integer distance, Integer price, String userID) {
         this.originCity = originCity;
@@ -26,6 +27,20 @@ public class TicketItem implements Serializable {
         this.distance = distance;
         this.price = price;
         this.userID = userID;
+    }
+
+    public TicketItem(String originCity, String destCity, Long departTime, Long arriveTime, Integer travelTime, String discount, String comfort, Integer distance, Integer price, String userID, String ticketID) {
+        this.originCity = originCity;
+        this.destCity = destCity;
+        this.departTime = departTime;
+        this.arriveTime = arriveTime;
+        this.travelTime = travelTime;
+        this.discount = discount;
+        this.comfort = comfort;
+        this.distance = distance;
+        this.price = price;
+        this.userID = userID;
+        this.ticketID = ticketID;
     }
 
     public String getOriginCity() {
@@ -106,5 +121,13 @@ public class TicketItem implements Serializable {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    public String getTicketID() {
+        return ticketID;
+    }
+
+    public void setTicketID(String ticketID) {
+        this.ticketID = ticketID;
     }
 }

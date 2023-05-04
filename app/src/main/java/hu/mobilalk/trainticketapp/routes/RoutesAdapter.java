@@ -1,7 +1,10 @@
 package hu.mobilalk.trainticketapp.routes;
 
+import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.os.Build;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,8 +25,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 
 import hu.mobilalk.trainticketapp.R;
+import hu.mobilalk.trainticketapp.NotificationHelper;
 import hu.mobilalk.trainticketapp.tickets.TicketItem;
-import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
 
 public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder> {
 
@@ -46,10 +52,7 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(context)
-                .inflate(
-                        R.layout.route_item,
-                        parent,
-                        false));
+                .inflate(R.layout.route_item, parent,false));
     }
 
     @Override
@@ -88,32 +91,22 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
         }
 
         public void bindTo(RouteItem currentItem) {
+            Resources res = itemView.getResources();
+
             originCityTextView.setText(currentItem.getOriginCity().getName());
             destCityTextView.setText(currentItem.getDestCity().getName());
             departTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getDepartTime()));
             arriveTimeTextView.setText(DateFormat.format("HH:mm", currentItem.getArriveTime()));
-            travelTimeTextView.setText(currentItem.getTravelTime() + " perc");
-            distanceTextView.setText(currentItem.getDistance() + " km");
+            travelTimeTextView.setText(String.format(res.getString(R.string.minutes), currentItem.getTravelTime()));
+            distanceTextView.setText(String.format(res.getString(R.string.distance), currentItem.getDistance()));
             comfortTextView.setText(currentItem.getComfort().toString());
             discountTextView.setText(currentItem.getDiscount().toString());
-            purchaseButton.setOnClickListener(view -> buy(view, currentItem));
-            purchaseButton.setText(currentItem.getPrice() + "Ft");
+            purchaseButton.setOnClickListener(view -> buy(currentItem));
+            purchaseButton.setText(String.format(res.getString(R.string.price), currentItem.getPrice()));
         }
 
-        public void buy(View view, RouteItem item) {
-
-            // originCity
-            // destCity
-            // departDate
-            // arriveDate
-            // distance
-            // travelTime
-            // comfort
-            // discount
-            // price
-            // userID
-
-            ticketsCollection.add(new TicketItem(
+        public void buy(RouteItem item) {
+            ((RoutesActivity) context).setTicketToBuy(new TicketItem(
                     item.getOriginCity().getName(),
                     item.getDestCity().getName(),
                     item.getDepartTime().getTime(),
@@ -126,7 +119,8 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
                     fireAuth.getUid()
             ));
 
-            view.getContext().startActivity(new Intent(view.getContext(), TicketsActivity.class));
+            ((RoutesActivity) context).purchaseTicket();
+
         }
     }
 

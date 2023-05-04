@@ -1,36 +1,29 @@
 package hu.mobilalk.trainticketapp.tickets;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
-import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import hu.mobilalk.trainticketapp.LoginActivity;
 import hu.mobilalk.trainticketapp.MainActivity;
 import hu.mobilalk.trainticketapp.R;
 import hu.mobilalk.trainticketapp.SettingsActivity;
-import hu.mobilalk.trainticketapp.enums.Comfort;
-import hu.mobilalk.trainticketapp.enums.Discount;
 
 public class TicketsActivity extends AppCompatActivity {
     private static final String LOG_TAG = TicketsAdapter.class.getName();
@@ -38,7 +31,6 @@ public class TicketsActivity extends AppCompatActivity {
     // FIREBASE
     FirebaseAuth fireAuth;
     FirebaseFirestore fireStore;
-    FirebaseFirestoreSettings fireSettings;
     CollectionReference ticketsCollection;
 
     // LISTING
@@ -46,16 +38,16 @@ public class TicketsActivity extends AppCompatActivity {
     ArrayList<TicketItem> ticketItemList;
     TicketsAdapter ticketsAdapter;
 
-    // BOTTOM NAV
-    BottomNavigationView bottomNav;
-
     // MISC
     Button loginButton;
+    BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tickets);
+
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
@@ -73,7 +65,7 @@ public class TicketsActivity extends AppCompatActivity {
         ticketsRV.setLayoutManager(new LinearLayoutManager(this));
         ticketsRV.setAdapter(ticketsAdapter);
 
-        // BOTTOM NAV
+        // MISC
         bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.tickets);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -84,9 +76,11 @@ public class TicketsActivity extends AppCompatActivity {
                     return true;
                 case R.id.tickets:
                     startActivity(new Intent(getApplicationContext(), TicketsActivity.class));
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 case R.id.settings:
                     startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 default:
                     return true;
@@ -96,19 +90,18 @@ public class TicketsActivity extends AppCompatActivity {
 
         });
 
-        // MISC
         loginButton = findViewById(R.id.loginButton);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // DISPLAY LOGIN BUTTON IF NOT LOGGED IN
         if (fireAuth.getCurrentUser() == null) {
             ticketsRV.setVisibility(View.GONE);
             loginButton.setVisibility(View.VISIBLE);
-            loginButton.setOnClickListener(view -> {
-                startActivity(new Intent(this, LoginActivity.class));
-            });
+            loginButton.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
         } else {
             ticketsRV.setVisibility(View.VISIBLE);
             loginButton.setVisibility(View.GONE);
@@ -121,20 +114,25 @@ public class TicketsActivity extends AppCompatActivity {
         ticketsCollection.whereEqualTo("userID", fireAuth.getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
             ticketItemList.clear();
             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                ticketItemList.add(new TicketItem(
+                ticketItemList.add(
+                        //document.toObject(TicketItem.class));
+
+                        new TicketItem(
                         document.getString("originCity"),
                         document.getString("destCity"),
                         document.getLong("departTime"),
                         document.getLong("arriveTime"),
-                        document.getLong("travelTime").intValue(),
+                        Objects.requireNonNull(document.getLong("travelTime")).intValue(),
                         document.getString("discount"),
                         document.getString("comfort"),
-                        document.getLong("distance").intValue(),
-                        document.getLong("price").intValue(),
-                        document.getString("userID")
+                        Objects.requireNonNull(document.getLong("distance")).intValue(),
+                        Objects.requireNonNull(document.getLong("price")).intValue(),
+                        document.getString("userID"),
+                        document.getId()
                 ));
             }
             ticketsAdapter.notifyDataSetChanged();
+            Log.i(LOG_TAG, "SUCCESSFUL tickets query!");
         });
 
     }

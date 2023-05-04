@@ -1,11 +1,12 @@
 package hu.mobilalk.trainticketapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -16,10 +17,18 @@ import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,14 +39,16 @@ import java.util.Objects;
 
 import hu.mobilalk.trainticketapp.enums.Comfort;
 import hu.mobilalk.trainticketapp.enums.Discount;
+import hu.mobilalk.trainticketapp.models.City;
 import hu.mobilalk.trainticketapp.routes.RoutesActivity;
 import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getName();
-    private static final String PREF_KEY = MainActivity.class.getPackage().toString();
+    private static final String PREF_KEY = Objects.requireNonNull(MainActivity.class.getPackage()).toString();
 
     // ANDROID
+    Gson gson = new Gson();
     SharedPreferences preferences;
     Calendar inputDate;
     Calendar currentDate;
@@ -77,49 +88,59 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.i(LOG_TAG, "ON CREATE MAIN");
-
-        getSupportActionBar().hide();
-
         // ANDROID
-        preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
+        preferences = this.getSharedPreferences(PREF_KEY, MODE_PRIVATE);
         currentDate = Calendar.getInstance();
         inputDate = Calendar.getInstance();
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
         citiesCollection = firestore.collection("cities");
 
+        // LOADING SPINNER
+        loadingSpinner = findViewById(R.id.loading_spinner);
+        loadingSpinner.setVisibility(View.VISIBLE);
+
+        // GETTING CITIES LIST
+        if (savedInstanceState != null) {
+            citiesList = gson.fromJson(
+                    savedInstanceState.getString("citiesList"),
+                    new TypeToken<List<City>>() {
+                    }.getType());
+            loadingSpinner.setVisibility(View.GONE);
+        }
+
+        if (citiesList == null) {
+            citiesList = new ArrayList<>();
+            queryCities();
+        }
+
         // CITY INPUT
         originACTV = findViewById(R.id.originACTV);
         destACTV = findViewById(R.id.destACTV);
-        citiesList = new ArrayList<>();
 
         originAdapter = new ArrayAdapter<>(
                 this,
-                com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
+                android.R.layout.simple_dropdown_item_1line,
                 citiesList);
         originACTV.setAdapter(originAdapter);
         originACTV.setThreshold(1);
-        originACTV.setOnFocusChangeListener((view, b) -> originACTV.showDropDown());
-        originACTV.setOnClickListener(view -> originACTV.showDropDown());
         originACTV.setOnItemClickListener((adapterView, view, i, l) -> {
             originCity = (City) adapterView.getItemAtPosition(i);
-            Log.i(LOG_TAG, "Selected start city: " + originCity);
+            Log.i(LOG_TAG, "Selected origin city: " + originCity);
         });
 
         destAdapter = new ArrayAdapter<>(
                 this,
-                com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
+                android.R.layout.simple_dropdown_item_1line,
                 citiesList);
         destACTV.setAdapter(destAdapter);
         destACTV.setThreshold(1);
-        destACTV.setOnFocusChangeListener((view, b) -> destACTV.showDropDown());
-        destACTV.setOnClickListener(view -> destACTV.showDropDown());
         destACTV.setOnItemClickListener((adapterView, view, i, l) -> {
             destCity = (City) adapterView.getItemAtPosition(i);
-            Log.i(LOG_TAG, "Selected start city: " + originCity);
+            Log.i(LOG_TAG, "Selected destination city: " + originCity);
         });
 
         // DATE INPUT
@@ -157,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
         // OTHER INPUT
         isDepartDateRadioGroup = findViewById(R.id.isDepartDateRadioGroup);
-        isDepartDateRadioGroup.check(R.id.depart);
+        isDepartDateRadioGroup.check(R.id.departRB);
         discountRadioGroup = findViewById(R.id.discountRadioGroup);
         discountRadioGroup.check(R.id.noDiscountRB);
         comfortRadioGroup = findViewById(R.id.comfortRadioGroup);
@@ -167,12 +188,15 @@ public class MainActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.searchButton);
         searchButton.setOnClickListener(this::search);
 
+        // MISC
+        // Bottom nav should be done with fragments though...
         bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.home);
         bottomNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.home:
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 case R.id.tickets:
                     startActivity(new Intent(getApplicationContext(), TicketsActivity.class));
@@ -180,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.settings:
                     startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 default:
                     return true;
@@ -188,35 +213,50 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemReselectedListener(item -> {
         });
 
-        // MISC
-        loadingSpinner = findViewById(R.id.loading_spinner);
-        loadingSpinner.setVisibility(View.VISIBLE);
-
-        queryCities();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        Log.i(LOG_TAG, "ON RESUME MAIN");
-        Log.i(LOG_TAG, currentDate.getTime().toString());
+        // LOAD SAVED CITY SELECTIONS
+        originCity = gson.fromJson(preferences.getString("originCity", ""), City.class);
+        destCity = gson.fromJson(preferences.getString("destCity", ""), City.class);
 
         bottomNav.setSelectedItemId(R.id.home);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // SAVE SELECTED CITIES
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("originCity", gson.toJson(originCity));
+        editor.putString("destCity", gson.toJson(destCity));
+        editor.apply();
+
+        Log.i(LOG_TAG, "ON_PAUSE_MAIN");
+
+        originACTV.dismissDropDown();
+        destACTV.dismissDropDown();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("citiesList", gson.toJson(citiesList));
+    }
+
     public void queryCities() {
-        citiesCollection.get().addOnSuccessListener(queryDocumentSnapshots -> {
+        citiesCollection.orderBy("name").get().addOnSuccessListener(queryDocumentSnapshots -> {
             citiesList.clear();
-            queryDocumentSnapshots.forEach(document -> {
-                citiesList.add(new City(
-                        document.getString("name"),
-                        document.getLong("distance").intValue(),
-                        document.getLong("routeID").intValue()
-                ));
-            });
-            originAdapter.notifyDataSetChanged();
-            destAdapter.notifyDataSetChanged();
+            queryDocumentSnapshots.forEach(document -> citiesList.add(new City(
+                    document.getString("name"),
+                    Objects.requireNonNull(document.getLong("distance")).intValue(),
+                    Objects.requireNonNull(document.getLong("routeID")).intValue()
+            )));
 
             loadingSpinner.setVisibility(View.GONE);
             Log.i(LOG_TAG, "SUCCESSFUL city data query!");
@@ -226,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
     public void search(View view) {
 
         // DATE TYPE
-        boolean isDepartDate = isDepartDateRadioGroup.getCheckedRadioButtonId() == R.id.depart;
+        boolean isDepartDate = isDepartDateRadioGroup.getCheckedRadioButtonId() == R.id.departRB;
 
         // CHECK DATA
         if (originCity == null || destCity == null) {
@@ -237,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         } else if (
                 (!isDepartDate && currentDate.after(inputDate))
-                || (isDepartDate && inputDate.before(currentDate))) {
+                        || (isDepartDate && inputDate.before(currentDate))) {
             Toast.makeText(this, "A választott idő már lejárt!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -253,10 +293,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // TRAVEL TIME
-        int travelTime = distance/2;
+        int travelTime = distance / 2;
 
         // DEPART FREQUENCY
-        int departFrequency = 60/(originCity.getRouteID() == 0 ? destCity.getRouteID() : originCity.getRouteID());
+        int departFrequency = 60 / (originCity.getRouteID() == 0 ? destCity.getRouteID() : originCity.getRouteID());
 
         // DEPART MINUTES
         int departMinutes = (int) Math.abs(Math.sin(distance) * 59);
@@ -278,6 +318,8 @@ public class MainActivity extends AppCompatActivity {
         Discount discount = discountMap.get(discountRadioGroup.getCheckedRadioButtonId());
 
         // PRICE
+        assert comfort != null;
+        assert discount != null;
         int price = (int) ((Math.log(distance) * 500 + comfort.getValue()) * discount.getValue());
 
         // INTENT
@@ -294,19 +336,6 @@ public class MainActivity extends AppCompatActivity {
         searchIntent.putExtra("discount", discount);
         searchIntent.putExtra("price", price);
 
-        // originCity
-        // destCity
-        // inputDate
-        // isDepartDate
-        // distance
-        // travelTime
-        // departFrequency
-        // departMinutes
-        // comfort
-        // discount
-        // price
-
         startActivity(searchIntent);
-
     }
 }

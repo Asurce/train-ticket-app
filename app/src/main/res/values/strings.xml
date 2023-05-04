@@ -22,4 +22,18 @@
     <string name="routes">Útvonalak</string>
     <string name="download">Letöltés</string>
     <string name="ticket_details">Vonatjegy</string>
+    <string name="modify_data">Adatok módosítása</string>
+    <string name="isDepart">Az időpont</string>
+    <string name="no_discount">nincs</string>
+    <string name="percent_50">50%</string>
+    <string name="percent_90">90%</string>
+    <string name="departure">indulás</string>
+    <string name="arrival">érkezés</string>
+    <string name="comfort">Helyjegy</string>
+    <string name="fastTrain">Gyorsvonat</string>
+    <string name="class_2">2. osztály</string>
+    <string name="class_1">1. osztály</string>
+    <string name="price">%1$d Ft</string>
+    <string name="minutes">%1$d perc</string>
+    <string name="distance">%1$d km</string>
 </resources>

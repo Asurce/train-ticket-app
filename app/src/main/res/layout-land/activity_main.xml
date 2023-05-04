@@ -94,11 +94,13 @@
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <RelativeLayout
+                        <LinearLayout
                             android:id="@+id/whenLinearLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="10dp"
+                            android:gravity="center"
+                            android:orientation="horizontal"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -109,7 +111,6 @@
                                 android:id="@+id/dateButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignParentStart="true"
                                 android:drawableEnd="@drawable/calendar"
                                 android:text="@string/placeholder" />
 
@@ -117,11 +118,11 @@
                                 android:id="@+id/timeButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
+                                android:layout_marginStart="50dp"
                                 android:drawableEnd="@drawable/clock"
                                 android:text="@string/placeholder" />
 
-                        </RelativeLayout>
+                        </LinearLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -253,6 +254,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
                     android:text="@string/search"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

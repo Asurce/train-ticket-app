@@ -6,15 +6,19 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.format.DateFormat;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -24,6 +28,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 import hu.mobilalk.trainticketapp.R;
 
@@ -31,6 +36,10 @@ import hu.mobilalk.trainticketapp.R;
 public class TicketDetailsActivity extends AppCompatActivity {
 
     TicketItem ticket;
+    Resources res;
+
+    // FIRESTORE
+    FirebaseFirestore firestore;
 
     // IMAGE
     Bitmap bitmap;
@@ -56,8 +65,12 @@ public class TicketDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ticket_details);
 
         // ANDROID, MISC
+        res = getResources();
         ticket = (TicketItem) getIntent().getSerializableExtra("ticketData");
         if (ticket == null) finish();
+
+        // FIRESTORE
+        firestore = FirebaseFirestore.getInstance();
 
         // IMAGE
         imageView = findViewById(R.id.qrCode);
@@ -87,11 +100,11 @@ public class TicketDetailsActivity extends AppCompatActivity {
         destCityTextView.setText((ticket).getDestCity());
         departTimeTextView.setText(DateFormat.format("HH:mm", (ticket).getDepartTime()));
         arriveTimeTextView.setText(DateFormat.format("HH:mm", (ticket).getArriveTime()));
-        travelTimeTextView.setText((ticket).getTravelTime() + " perc");
-        distanceTextView.setText((ticket).getDistance() + " km");
-        comfortTextView.setText((ticket).getComfort());
-        discountTextView.setText((ticket).getDiscount());
-        priceButton.setText((ticket).getPrice() + "Ft");
+        travelTimeTextView.setText(String.format(res.getString(R.string.minutes), ticket.getTravelTime()));
+        distanceTextView.setText(String.format(res.getString(R.string.distance), ticket.getDistance()));
+        comfortTextView.setText(ticket.getComfort());
+        discountTextView.setText(ticket.getDiscount());
+        priceButton.setText(String.format(res.getString(R.string.price), ticket.getPrice()));
 
         // BUTTONS
         downloadButton = findViewById(R.id.downloadButton);
@@ -105,19 +118,15 @@ public class TicketDetailsActivity extends AppCompatActivity {
         });
 
         // ACTION BAR
-        getSupportActionBar().setTitle(R.string.ticket_details);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.ticket_details);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
 
     }
 
     private boolean checkPermissionGranted(){
-        if((ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-            // Permission has already been granted
-            return  true;
-        } else {
-            return false;
-        }
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
 
     private void requestPermission(){
@@ -137,11 +146,31 @@ public class TicketDetailsActivity extends AppCompatActivity {
             e.printStackTrace();
         } finally {
             try {
+                assert fos != null;
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.ticket_details_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.deleteButton) {
+            firestore.collection("tickets").document(ticket.getTicketID()).delete();
+            finish();
+        } else if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
 }

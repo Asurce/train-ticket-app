@@ -14,6 +14,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Objects;
+
+import hu.mobilalk.trainticketapp.models.User;
+
 public class RegisterActivity extends AppCompatActivity {
     private static final String LOG_TAG = RegisterActivity.class.getName();
 
@@ -42,8 +46,6 @@ public class RegisterActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
         usersCollection = firestore.collection("users");
 
-        if (fireAuth.getCurrentUser() != null) finish();
-
         // INPUTS
         lastName = findViewById(R.id.lastNameEditText);
         firstName = findViewById(R.id.firstNameEditText);
@@ -56,9 +58,15 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setOnClickListener(this::register);
 
         // ACTION BAR
-        getSupportActionBar().setTitle(R.string.register);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.register);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (fireAuth.getCurrentUser() != null) finish();
     }
 
     public void register(View view) {
@@ -73,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Log.i(LOG_TAG, "User registration SUCCESSFUL!");
                         usersCollection.add(new User(
-                                task.getResult().getUser().getUid(),
+                                Objects.requireNonNull(task.getResult().getUser()).getUid(),
                                 firstName.getText().toString(),
                                 lastName.getText().toString()
                         ));
@@ -83,9 +91,6 @@ public class RegisterActivity extends AppCompatActivity {
                         Toast.makeText(RegisterActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                     }
                 });
-
-        finish();
-
     }
 
     @Override

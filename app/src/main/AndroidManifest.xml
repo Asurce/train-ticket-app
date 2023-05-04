@@ -22,25 +22,18 @@
             android:exported="false"
             android:launchMode="singleInstance" />
         <activity
-            android:name=".PurchaseActivity"
-            android:exported="false"
-            android:launchMode="singleInstance" />
-        <activity
             android:name=".routes.RoutesActivity"
-            android:exported="false"
-            android:launchMode="singleInstance" />
+            android:exported="false" />
         <activity
             android:name=".RegisterActivity"
-            android:exported="false"
-            android:launchMode="singleInstance" />
+            android:exported="false" />
         <activity
             android:name=".tickets.TicketsActivity"
             android:exported="false"
             android:launchMode="singleInstance" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false"
-            android:launchMode="singleInstance" />
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

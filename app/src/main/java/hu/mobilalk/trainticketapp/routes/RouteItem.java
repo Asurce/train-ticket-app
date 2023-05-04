@@ -3,7 +3,7 @@ package hu.mobilalk.trainticketapp.routes;
 import java.io.Serializable;
 import java.util.Date;
 
-import hu.mobilalk.trainticketapp.City;
+import hu.mobilalk.trainticketapp.models.City;
 import hu.mobilalk.trainticketapp.enums.Comfort;
 import hu.mobilalk.trainticketapp.enums.Discount;
 

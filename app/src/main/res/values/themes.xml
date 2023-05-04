@@ -27,8 +27,12 @@
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
 
-<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
-<!--        <item name="android:windowLightStatusBar">true</item>-->
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+
+        <item name="android:statusBarColor">@color/md_theme_light_background</item>
+        <item name="android:windowLightStatusBar">true</item>
 
         <item name="actionBarStyle">@style/ThemeActionBar</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Material3.Corner.Medium</item>
@@ -49,5 +53,10 @@
     <style name="ThemeActionBar" parent="Widget.Material3.Light.ActionBar.Solid">
         <item name="android:background">@color/md_theme_light_background</item>
         <item name="background">@color/md_theme_light_background</item>
+    </style>
+
+    <style name="WindowAnimationTransition">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
     </style>
 </resources>

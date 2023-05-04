@@ -1,7 +1,5 @@
 package hu.mobilalk.trainticketapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,9 +7,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String LOG_TAG = LoginActivity.class.getName();
@@ -34,7 +35,6 @@ public class LoginActivity extends AppCompatActivity {
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
-        if (fireAuth.getCurrentUser() != null) finish();
 
         // INPUTS
         emailEditText = findViewById(R.id.loginEmailEditText);
@@ -47,8 +47,14 @@ public class LoginActivity extends AppCompatActivity {
         registerButton.setOnClickListener(this::register);
 
         // ACTION BAR
-        getSupportActionBar().setTitle(R.string.login);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.login);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (fireAuth.getCurrentUser() != null) finish();
     }
 
     public void login(View view) {

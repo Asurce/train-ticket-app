@@ -17,16 +17,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
-import hu.mobilalk.trainticketapp.MainActivity;
 import hu.mobilalk.trainticketapp.R;
 
 public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHolder> {
 
     // ADAPTER
     Context context;
-
     ArrayList<TicketItem> items;
 
     // FIREBASE
@@ -78,8 +75,8 @@ public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHold
 
         public void bindTo(TicketItem currentItem) {
             calendar.setTimeInMillis(currentItem.getDepartTime());
-            timeTextView.setText(DateFormat.format("HH:mm",calendar.getTime()));
-            dateTextView.setText(DateFormat.format("yyyy. MM. dd",calendar.getTime()));
+            timeTextView.setText(DateFormat.format("HH:mm", calendar.getTime()));
+            dateTextView.setText(DateFormat.format("yyyy. MM. dd", calendar.getTime()));
             originCityTextView.setText(currentItem.getOriginCity());
             destCityTextView.setText(currentItem.getDestCity());
 
@@ -90,5 +87,4 @@ public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHold
             });
         }
     }
-
 }
