@@ -1,12 +1,8 @@
 package hu.mobilalk.trainticketapp;
 
-import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -18,10 +14,8 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.common.reflect.TypeToken;
@@ -45,11 +39,9 @@ import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getName();
-    private static final String PREF_KEY = Objects.requireNonNull(MainActivity.class.getPackage()).toString();
 
     // ANDROID
     Gson gson = new Gson();
-    SharedPreferences preferences;
     Calendar inputDate;
     Calendar currentDate;
 
@@ -80,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     Button searchButton;
 
     // MISC
+    ActionBar actionBar;
     View loadingSpinner;
     BottomNavigationView bottomNav;
 
@@ -89,10 +82,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // ANDROID
-        preferences = this.getSharedPreferences(PREF_KEY, MODE_PRIVATE);
         currentDate = Calendar.getInstance();
         inputDate = Calendar.getInstance();
-        Objects.requireNonNull(getSupportActionBar()).hide();
+
+        // ACTION BAR
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
@@ -104,16 +101,15 @@ public class MainActivity extends AppCompatActivity {
         loadingSpinner.setVisibility(View.VISIBLE);
 
         // GETTING CITIES LIST
+        citiesList = new ArrayList<>();
         if (savedInstanceState != null) {
             citiesList = gson.fromJson(
                     savedInstanceState.getString("citiesList"),
-                    new TypeToken<List<City>>() {
-                    }.getType());
+                    new TypeToken<List<City>>() {}.getType());
+            originCity = gson.fromJson(savedInstanceState.getString("originCity"), City.class);
+            destCity = gson.fromJson(savedInstanceState.getString("destCity"), City.class);
             loadingSpinner.setVisibility(View.GONE);
-        }
-
-        if (citiesList == null) {
-            citiesList = new ArrayList<>();
+        } else {
             queryCities();
         }
 
@@ -143,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i(LOG_TAG, "Selected destination city: " + originCity);
         });
 
-        // DATE INPUT
+        // DATE AND TIME INPUT
         dateButton = findViewById(R.id.dateButton);
         timeButton = findViewById(R.id.timeButton);
         dateButton.setText(DateFormat.format("yyyy. MMMM. dd.", inputDate.getTime()));
@@ -218,24 +214,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // LOAD SAVED CITY SELECTIONS
-        originCity = gson.fromJson(preferences.getString("originCity", ""), City.class);
-        destCity = gson.fromJson(preferences.getString("destCity", ""), City.class);
-
         bottomNav.setSelectedItemId(R.id.home);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        // SAVE SELECTED CITIES
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("originCity", gson.toJson(originCity));
-        editor.putString("destCity", gson.toJson(destCity));
-        editor.apply();
-
         Log.i(LOG_TAG, "ON_PAUSE_MAIN");
 
         originACTV.dismissDropDown();
@@ -247,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         outState.putString("citiesList", gson.toJson(citiesList));
+        outState.putString("originCity", gson.toJson(originCity));
+        outState.putString("destCity", gson.toJson(destCity));
     }
 
     public void queryCities() {

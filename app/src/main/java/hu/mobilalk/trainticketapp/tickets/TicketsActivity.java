@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -39,15 +41,21 @@ public class TicketsActivity extends AppCompatActivity {
     TicketsAdapter ticketsAdapter;
 
     // MISC
+    ActionBar actionBar;
     Button loginButton;
     BottomNavigationView bottomNav;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tickets);
 
-        Objects.requireNonNull(getSupportActionBar()).hide();
+        // ACTION BAR
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
@@ -90,7 +98,9 @@ public class TicketsActivity extends AppCompatActivity {
 
         });
 
+        // LOGIN BUTTON
         loginButton = findViewById(R.id.loginButton);
+        loginButton.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
     }
 
     @Override
@@ -101,7 +111,6 @@ public class TicketsActivity extends AppCompatActivity {
         if (fireAuth.getCurrentUser() == null) {
             ticketsRV.setVisibility(View.GONE);
             loginButton.setVisibility(View.VISIBLE);
-            loginButton.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
         } else {
             ticketsRV.setVisibility(View.VISIBLE);
             loginButton.setVisibility(View.GONE);
@@ -111,12 +120,14 @@ public class TicketsActivity extends AppCompatActivity {
     }
 
     private void queryTickets() {
-        ticketsCollection.whereEqualTo("userID", fireAuth.getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
+        ticketsCollection
+                .whereEqualTo("userID", fireAuth.getUid())
+                .orderBy("departTime", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
             ticketItemList.clear();
             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                 ticketItemList.add(
-                        //document.toObject(TicketItem.class));
-
                         new TicketItem(
                         document.getString("originCity"),
                         document.getString("destCity"),

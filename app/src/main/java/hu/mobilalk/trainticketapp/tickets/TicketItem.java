@@ -1,7 +1,11 @@
 package hu.mobilalk.trainticketapp.tickets;
 
+import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.IgnoreExtraProperties;
+
 import java.io.Serializable;
 
+@IgnoreExtraProperties
 public class TicketItem implements Serializable {
 
     private String originCity;
@@ -14,6 +18,7 @@ public class TicketItem implements Serializable {
     private Integer distance;
     private Integer price;
     private String userID;
+    @Exclude
     private String ticketID;
 
     public TicketItem(String originCity, String destCity, Long departTime, Long arriveTime, Integer travelTime, String discount, String comfort, Integer distance, Integer price, String userID) {
@@ -123,10 +128,12 @@ public class TicketItem implements Serializable {
         this.userID = userID;
     }
 
+    @Exclude
     public String getTicketID() {
         return ticketID;
     }
 
+    @Exclude
     public void setTicketID(String ticketID) {
         this.ticketID = ticketID;
     }

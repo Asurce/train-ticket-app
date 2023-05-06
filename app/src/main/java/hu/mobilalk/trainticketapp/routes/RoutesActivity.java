@@ -10,28 +10,31 @@ import android.view.MenuItem;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Objects;
+import java.util.List;
 
-import hu.mobilalk.trainticketapp.NotificationHelper;
-import hu.mobilalk.trainticketapp.models.City;
 import hu.mobilalk.trainticketapp.LoginActivity;
+import hu.mobilalk.trainticketapp.NotificationHelper;
 import hu.mobilalk.trainticketapp.R;
 import hu.mobilalk.trainticketapp.enums.Comfort;
 import hu.mobilalk.trainticketapp.enums.Discount;
+import hu.mobilalk.trainticketapp.models.City;
 import hu.mobilalk.trainticketapp.tickets.TicketItem;
 import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
 
@@ -39,6 +42,7 @@ public class RoutesActivity extends AppCompatActivity {
     private static final String LOG_TAG = RoutesActivity.class.getName();
 
     // ANDROID
+    Gson gson = new GsonBuilder().setDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz").create();
     Calendar referenceCalendar;
     Calendar inputDate;
     NotificationHelper notificationHelper;
@@ -55,7 +59,7 @@ public class RoutesActivity extends AppCompatActivity {
 
     // MISC
     boolean isDepartDate;
-
+    ActionBar actionBar;
     ActivityResultLauncher<Intent> loginLauncher;
     TicketItem ticketToBuy;
 
@@ -69,7 +73,14 @@ public class RoutesActivity extends AppCompatActivity {
         inputDate = (Calendar) getIntent().getSerializableExtra("inputDate");
         isDepartDate = getIntent().getBooleanExtra("isDepartDate", true);
         notificationHelper = new NotificationHelper(this);
-        if (inputDate == null) finish();
+        if (inputDate == null && savedInstanceState == null) finish();
+
+        // ACTION BAR
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.routes);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
@@ -79,14 +90,14 @@ public class RoutesActivity extends AppCompatActivity {
         // LISTING
         routesRV = findViewById(R.id.trainRecyclerView);
         routesList = new ArrayList<>();
-        initializeData();
+        if (savedInstanceState != null) {
+            routesList = gson.fromJson(savedInstanceState.getString("routesList"), new TypeToken<ArrayList<RouteItem>>() {}.getType());
+        } else {
+            initializeData();
+        }
         routesAdapter = new RoutesAdapter(this, routesList);
         routesRV.setLayoutManager(new LinearLayoutManager(this));
         routesRV.setAdapter(routesAdapter);
-
-        // ACTION BAR
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.routes);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // WAIT FOR LOGIN
         loginLauncher =
@@ -99,6 +110,13 @@ public class RoutesActivity extends AppCompatActivity {
                                 startActivity(new Intent(this, TicketsActivity.class));
                             }
                         });
+
+        // NOTIFICATION PERMISSION FOR ANDROID 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this,Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[] {Manifest.permission.POST_NOTIFICATIONS}, 1);
+            }
+        }
     }
 
     private void initializeData() {
@@ -141,10 +159,18 @@ public class RoutesActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "SUCCESSFULLY generated all route items!");
     }
 
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("routesList", gson.toJson(routesList));
+    }
+
     public void purchaseTicket() {
         if (fireAuth.getCurrentUser() == null) {
             loginLauncher.launch(new Intent(this, LoginActivity.class));
         } else {
+            ticketToBuy.setUserID(fireAuth.getUid());
             ticketsCollection.add(ticketToBuy);
             notificationHelper.send("Sikeres vásárlás!");
             startActivity(new Intent(this, TicketsActivity.class));

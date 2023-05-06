@@ -6,6 +6,8 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,6 +33,8 @@ public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHold
     FirebaseFirestore firestore;
     CollectionReference ticketsCollection;
 
+    int lastPosition = -1;
+
     TicketsAdapter(Context context, ArrayList<TicketItem> items) {
         this.items = items;
         this.context = context;
@@ -49,6 +53,12 @@ public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull TicketsAdapter.ViewHolder holder, int position) {
         holder.bindTo(items.get(position));
+
+        if(holder.getAdapterPosition() > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+            holder.itemView.startAnimation(animation);
+            lastPosition = holder.getAdapterPosition();
+        }
     }
 
     @Override

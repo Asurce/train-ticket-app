@@ -44,12 +44,12 @@ public class NotificationHelper {
     public void send(String message) {
         Intent intent = new Intent(context, RoutesActivity.class);
         int NOTIFICATION_ID = 0;
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, NOTIFICATION_ID, intent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setContentTitle("TrainTicketApp")
+                .setContentTitle("Jegyvásárlás")
                 .setContentText(message)
-                .setSmallIcon(R.drawable.cart)
+                .setSmallIcon(R.drawable.train_icon)
                 .setContentIntent(pendingIntent);
 
         notificationManager.notify(NOTIFICATION_ID, builder.build());

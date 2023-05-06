@@ -9,6 +9,8 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -23,6 +25,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import hu.mobilalk.trainticketapp.R;
 import hu.mobilalk.trainticketapp.NotificationHelper;
@@ -38,6 +41,8 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
     FirebaseAuth fireAuth;
     FirebaseFirestore firestore;
     CollectionReference ticketsCollection;
+
+    int lastPosition = -1;
 
     RoutesAdapter(Context context, ArrayList<RouteItem> items) {
         this.items = items;
@@ -58,6 +63,12 @@ public class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RoutesAdapter.ViewHolder holder, int position) {
         holder.bindTo(items.get(position));
+
+        if(holder.getAdapterPosition() > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.zoom_in);
+            holder.itemView.startAnimation(animation);
+            lastPosition = holder.getAdapterPosition();
+        }
     }
 
     @Override

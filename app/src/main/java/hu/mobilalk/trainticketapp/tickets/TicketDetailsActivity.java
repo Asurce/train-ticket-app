@@ -1,5 +1,6 @@
 package hu.mobilalk.trainticketapp.tickets;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -35,8 +36,6 @@ import hu.mobilalk.trainticketapp.R;
 
 public class TicketDetailsActivity extends AppCompatActivity {
 
-    TicketItem ticket;
-    Resources res;
 
     // FIRESTORE
     FirebaseFirestore firestore;
@@ -59,6 +58,11 @@ public class TicketDetailsActivity extends AppCompatActivity {
     // BUTTONS
     Button downloadButton;
 
+    // MISC
+    ActionBar actionBar;
+    TicketItem ticket;
+    Resources res;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +73,14 @@ public class TicketDetailsActivity extends AppCompatActivity {
         ticket = (TicketItem) getIntent().getSerializableExtra("ticketData");
         if (ticket == null) finish();
 
+        // ACTION BAR
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.ticket_details);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowCustomEnabled(true);
+        }
+
         // FIRESTORE
         firestore = FirebaseFirestore.getInstance();
 
@@ -77,7 +89,7 @@ public class TicketDetailsActivity extends AppCompatActivity {
         MultiFormatWriter mWriter = new MultiFormatWriter();
         try {
             assert ticket != null;
-            BitMatrix mMatrix = mWriter.encode(ticket.toString(), BarcodeFormat.PDF_417, 800, 200);
+            BitMatrix mMatrix = mWriter.encode(ticket.toString(), BarcodeFormat.QR_CODE, 800, 800);
             BarcodeEncoder mEncoder = new BarcodeEncoder();
             bitmap = mEncoder.createBitmap(mMatrix);
             imageView.setImageBitmap(bitmap);
@@ -109,34 +121,28 @@ public class TicketDetailsActivity extends AppCompatActivity {
         // BUTTONS
         downloadButton = findViewById(R.id.downloadButton);
         downloadButton.setOnClickListener(view -> {
-            if(checkPermissionGranted()){
-                Toast.makeText(this, "Barcode saved!", Toast.LENGTH_SHORT).show();
+            if (checkPermissionGranted()) {
+                Toast.makeText(this, "Jegy letöltve!", Toast.LENGTH_SHORT).show();
                 saveToInternalStorage(bitmap);
-            }else{
+            } else {
                 requestPermission();
             }
         });
 
-        // ACTION BAR
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.ticket_details);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-
     }
 
-    private boolean checkPermissionGranted(){
+    private boolean checkPermissionGranted() {
         return (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 && (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
 
-    private void requestPermission(){
+    private void requestPermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
     }
 
-
-    private void saveToInternalStorage(Bitmap bitmapImage){
+    private void saveToInternalStorage(Bitmap bitmapImage) {
         File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "");
-        File path = new File(directory,"ticket_"+ ticket.hashCode() +".jpg");
+        File path = new File(directory, "ticket_" + ticket.hashCode() + ".jpg");
 
         FileOutputStream fos = null;
         try {
@@ -171,6 +177,4 @@ public class TicketDetailsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 }

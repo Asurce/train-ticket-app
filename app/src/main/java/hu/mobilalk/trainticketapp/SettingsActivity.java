@@ -8,12 +8,15 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firestore.v1.Document;
 
 import java.util.Objects;
 
@@ -36,6 +39,7 @@ public class SettingsActivity extends AppCompatActivity {
     Button logoutButton;
 
     // MISC
+    ActionBar actionBar;
     LinearLayout linearLayout;
     BottomNavigationView bottomNav;
 
@@ -45,7 +49,10 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         // ACTION BAR
-        Objects.requireNonNull(getSupportActionBar()).hide();
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
@@ -104,15 +111,19 @@ public class SettingsActivity extends AppCompatActivity {
         if (fireAuth.getCurrentUser() == null) {
             linearLayout.setVisibility(View.GONE);
             loginButton.setVisibility(View.VISIBLE);
-            loginButton.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
         } else {
             linearLayout.setVisibility(View.VISIBLE);
             loginButton.setVisibility(View.GONE);
-            firestore.collection("users").whereEqualTo("id", fireAuth.getUid()).get().addOnSuccessListener(querySnapshot -> {
+            firestore.collection("users")
+                    .whereEqualTo("id", fireAuth.getUid())
+                    .limit(1)
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
                 if (querySnapshot.getDocuments().size() == 1) {
-                    userReference = querySnapshot.getDocuments().get(0).getReference();
-                    firstName.setText(querySnapshot.getDocuments().get(0).getString("firstName"));
-                    lastName.setText(querySnapshot.getDocuments().get(0).getString("lastName"));
+                    DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                    userReference = document.getReference();
+                    firstName.setText(document.getString("firstName"));
+                    lastName.setText(document.getString("lastName"));
                 } else {
                     onResume();
                 }

@@ -8,11 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String LOG_TAG = LoginActivity.class.getName();
@@ -28,10 +27,20 @@ public class LoginActivity extends AppCompatActivity {
     Button loginButton;
     Button registerButton;
 
+    // MISC
+    ActionBar actionBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // ACTION BAR
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.login);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
@@ -44,11 +53,8 @@ public class LoginActivity extends AppCompatActivity {
 
         // BUTTONS
         loginButton.setOnClickListener(this::login);
-        registerButton.setOnClickListener(this::register);
+        registerButton.setOnClickListener(view -> startActivity(new Intent(this, RegisterActivity.class)));
 
-        // ACTION BAR
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.login);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -58,17 +64,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
+        // TODO empty
         fireAuth.signInWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         Log.i(LOG_TAG, "Login SUCCESSFUL!");
+                        // TODO
                         finish();
                     } else Log.i(LOG_TAG, "Login FAILED!");
                 });
-    }
-
-    public void register(View view) {
-        startActivity(new Intent(this, RegisterActivity.class));
     }
 
     @Override

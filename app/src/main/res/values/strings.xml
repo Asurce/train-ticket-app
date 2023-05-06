@@ -36,4 +36,6 @@
     <string name="price">%1$d Ft</string>
     <string name="minutes">%1$d perc</string>
     <string name="distance">%1$d km</string>
+    <string name="budapest">Budapest</string>
+    <string name="dummy_time">14:00</string>
 </resources>
