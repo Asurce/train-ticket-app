@@ -29,7 +29,7 @@
                     android:id="@+id/departTimeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="12:00"
+                    android:text="@string/dummy_time"
                     android:textAlignment="center"
                     android:textSize="30sp" />
 
@@ -37,7 +37,7 @@
                     android:id="@+id/originCityTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Szeged"
+                    android:text="@string/budapest"
                     android:textAlignment="center"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -58,7 +58,7 @@
                     android:id="@+id/travelTimeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="120 perc" />
+                    android:text="@string/minutes" />
 
                 <View
                     android:id="@+id/spacer"
@@ -71,7 +71,7 @@
                     android:id="@+id/distanceTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="180 km" />
+                    android:text="@string/distance" />
             </LinearLayout>
 
             <LinearLayout
@@ -88,7 +88,7 @@
                     android:id="@+id/arriveTimeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="14:00"
+                    android:text="@string/dummy_time"
                     android:textAlignment="center"
                     android:textSize="30sp" />
 
@@ -96,7 +96,7 @@
                     android:id="@+id/destCityTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Budapest"
+                    android:text="@string/budapest"
                     android:textAlignment="center"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -118,7 +118,7 @@
                 android:id="@+id/comfortTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1. osztály"
+                android:text="@string/class_1"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -129,7 +129,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/comfortTextView"
                 android:layout_marginTop="8dp"
-                android:text="50% kedvezmény"
+                android:text="@string/discounts"
                 android:textSize="15sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -142,7 +142,7 @@
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/cart"
                 android:drawableTint="@color/cardview_light_background"
-                android:text="2500Ft"
+                android:text="@string/price"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

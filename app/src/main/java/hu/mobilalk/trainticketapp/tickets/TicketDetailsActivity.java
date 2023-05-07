@@ -1,10 +1,5 @@
 package hu.mobilalk.trainticketapp.tickets;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -19,6 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -29,7 +29,6 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Objects;
 
 import hu.mobilalk.trainticketapp.R;
 
@@ -169,6 +168,7 @@ public class TicketDetailsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.deleteButton) {
+            Toast.makeText(this, "Jegy törölve!", Toast.LENGTH_SHORT).show();
             firestore.collection("tickets").document(ticket.getTicketID()).delete();
             finish();
         } else if (item.getItemId() == android.R.id.home) {

@@ -38,4 +38,5 @@
     <string name="distance">%1$d km</string>
     <string name="budapest">Budapest</string>
     <string name="dummy_time">14:00</string>
+    <string name="no_result">Nincs találat.</string>
 </resources>

@@ -10,7 +10,6 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
-import hu.mobilalk.trainticketapp.R;
 import hu.mobilalk.trainticketapp.routes.RoutesActivity;
 
 public class NotificationHelper {

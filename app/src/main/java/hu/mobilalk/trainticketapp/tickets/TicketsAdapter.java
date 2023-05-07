@@ -55,7 +55,7 @@ public class TicketsAdapter extends RecyclerView.Adapter<TicketsAdapter.ViewHold
         holder.bindTo(items.get(position));
 
         if(holder.getAdapterPosition() > lastPosition) {
-            Animation animation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in);
             holder.itemView.startAnimation(animation);
             lastPosition = holder.getAdapterPosition();
         }

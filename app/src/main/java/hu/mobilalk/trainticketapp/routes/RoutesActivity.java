@@ -7,6 +7,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,7 +29,6 @@ import com.google.gson.GsonBuilder;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import hu.mobilalk.trainticketapp.LoginActivity;
 import hu.mobilalk.trainticketapp.NotificationHelper;
@@ -60,6 +61,7 @@ public class RoutesActivity extends AppCompatActivity {
     // MISC
     boolean isDepartDate;
     ActionBar actionBar;
+    TextView noResultTV;
     ActivityResultLauncher<Intent> loginLauncher;
     TicketItem ticketToBuy;
 
@@ -73,6 +75,7 @@ public class RoutesActivity extends AppCompatActivity {
         inputDate = (Calendar) getIntent().getSerializableExtra("inputDate");
         isDepartDate = getIntent().getBooleanExtra("isDepartDate", true);
         notificationHelper = new NotificationHelper(this);
+        noResultTV = findViewById(R.id.noResultTV);
         if (inputDate == null && savedInstanceState == null) finish();
 
         // ACTION BAR
@@ -154,6 +157,11 @@ public class RoutesActivity extends AppCompatActivity {
                     getIntent().getIntExtra("price", 0)
             ));
             inputDate.setTimeInMillis(inputDate.getTimeInMillis() + (departFrequency * 60000L));
+        }
+
+        if (routesList.isEmpty()) {
+            noResultTV.setVisibility(View.VISIBLE);
+            routesRV.setVisibility(View.GONE);
         }
 
         Log.i(LOG_TAG, "SUCCESSFULLY generated all route items!");

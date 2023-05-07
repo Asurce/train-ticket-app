@@ -16,9 +16,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firestore.v1.Document;
-
-import java.util.Objects;
 
 import hu.mobilalk.trainticketapp.tickets.TicketsActivity;
 
@@ -77,32 +74,27 @@ public class SettingsActivity extends AppCompatActivity {
 
         // BOTTOM NAV
         bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setSelectedItemId(R.id.tickets);
+        bottomNav.setSelectedItemId(R.id.settings);
         bottomNav.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.home:
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 case R.id.tickets:
                     startActivity(new Intent(getApplicationContext(), TicketsActivity.class));
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 case R.id.settings:
                     startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 default:
                     return true;
             }
         });
         bottomNav.setOnItemReselectedListener(item -> {
-
         });
 
         // MISC
         linearLayout = findViewById(R.id.linearLayout);
-
     }
 
     @Override

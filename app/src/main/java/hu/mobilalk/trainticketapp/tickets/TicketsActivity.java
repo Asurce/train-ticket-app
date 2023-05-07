@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +44,7 @@ public class TicketsActivity extends AppCompatActivity {
     // MISC
     ActionBar actionBar;
     Button loginButton;
+    TextView noResultTV;
     BottomNavigationView bottomNav;
 
 
@@ -56,6 +58,8 @@ public class TicketsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
+
+        noResultTV = findViewById(R.id.noResultTV);
 
         // FIREBASE
         fireAuth = FirebaseAuth.getInstance();
@@ -80,22 +84,18 @@ public class TicketsActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.home:
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 case R.id.tickets:
                     startActivity(new Intent(getApplicationContext(), TicketsActivity.class));
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 case R.id.settings:
                     startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     return true;
                 default:
                     return true;
             }
         });
         bottomNav.setOnItemReselectedListener(item -> {
-
         });
 
         // LOGIN BUTTON
@@ -125,26 +125,31 @@ public class TicketsActivity extends AppCompatActivity {
                 .orderBy("departTime", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-            ticketItemList.clear();
-            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                ticketItemList.add(
-                        new TicketItem(
-                        document.getString("originCity"),
-                        document.getString("destCity"),
-                        document.getLong("departTime"),
-                        document.getLong("arriveTime"),
-                        Objects.requireNonNull(document.getLong("travelTime")).intValue(),
-                        document.getString("discount"),
-                        document.getString("comfort"),
-                        Objects.requireNonNull(document.getLong("distance")).intValue(),
-                        Objects.requireNonNull(document.getLong("price")).intValue(),
-                        document.getString("userID"),
-                        document.getId()
-                ));
-            }
-            ticketsAdapter.notifyDataSetChanged();
-            Log.i(LOG_TAG, "SUCCESSFUL tickets query!");
-        });
+                    ticketItemList.clear();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        ticketItemList.add(
+                                new TicketItem(
+                                        document.getString("originCity"),
+                                        document.getString("destCity"),
+                                        document.getLong("departTime"),
+                                        document.getLong("arriveTime"),
+                                        Objects.requireNonNull(document.getLong("travelTime")).intValue(),
+                                        document.getString("discount"),
+                                        document.getString("comfort"),
+                                        Objects.requireNonNull(document.getLong("distance")).intValue(),
+                                        Objects.requireNonNull(document.getLong("price")).intValue(),
+                                        document.getString("userID"),
+                                        document.getId()
+                                ));
+                    }
 
+                    if (ticketItemList.isEmpty()) {
+                        noResultTV.setVisibility(View.VISIBLE);
+                        ticketsRV.setVisibility(View.GONE);
+                    }
+
+                    ticketsAdapter.notifyDataSetChanged();
+                    Log.i(LOG_TAG, "SUCCESSFUL tickets query!");
+                });
     }
 }

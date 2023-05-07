@@ -7,11 +7,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String LOG_TAG = LoginActivity.class.getName();
@@ -64,14 +66,27 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
-        // TODO empty
+        if (emailEditText.getText().length() == 0 || passwordEditText.getText().length() == 0) {
+            Toast.makeText(this, "Minden mezőt ki kell tölteni!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         fireAuth.signInWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         Log.i(LOG_TAG, "Login SUCCESSFUL!");
-                        // TODO
                         finish();
-                    } else Log.i(LOG_TAG, "Login FAILED!");
+                    } else {
+                        try {
+                            throw task.getException();
+                        } catch (FirebaseAuthInvalidCredentialsException e) {
+                            Toast.makeText(this, "Hibás email vagy jelszó!", Toast.LENGTH_SHORT).show();
+                            emailEditText.requestFocus();
+                        } catch (Exception e) {
+                            Toast.makeText(this, "Hiba történt!", Toast.LENGTH_SHORT).show();
+                        }
+                        Log.i(LOG_TAG, "Login FAILED!");
+                    }
                 });
     }
 

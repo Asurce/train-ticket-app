@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -78,11 +80,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void register(View view) {
 
-        if (!password.getText().toString().equals(passwordAgain.getText().toString())) {
+        if (firstName.getText().length() == 0 || lastName.getText().length() == 0 || email.getText().length() == 0) {
+            Toast.makeText(this, "Minden mezőt ki kell tölteni!", Toast.LENGTH_SHORT).show();
+        } else if (!password.getText().toString().equals(passwordAgain.getText().toString())) {
             Toast.makeText(this, "Jelszó nem egyezik!", Toast.LENGTH_SHORT).show();
-            return;
-        } else if (password.getText().length() < 6) {
-            Toast.makeText(this, "Túl rövid jelszó, minimum 6 karakter legyen!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -97,8 +98,18 @@ public class RegisterActivity extends AppCompatActivity {
                         ));
                         finish();
                     } else {
+                        try {
+                            throw task.getException();
+                        } catch (FirebaseAuthWeakPasswordException e) {
+                            Toast.makeText(this, "Túl rövid jelszó, minimum 6 karakter legyen!", Toast.LENGTH_SHORT).show();
+                            password.requestFocus();
+                        } catch (FirebaseAuthUserCollisionException e) {
+                            Toast.makeText(this, "Az email cím foglalt!", Toast.LENGTH_SHORT).show();
+                            email.requestFocus();
+                        } catch (Exception e) {
+                            Toast.makeText(this, "Hiba történt!", Toast.LENGTH_SHORT).show();
+                        }
                         Log.i(LOG_TAG, "User registration FAILED!");
-                        Toast.makeText(RegisterActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
