@@ -80,8 +80,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void register(View view) {
 
-        if (firstName.getText().length() == 0 || lastName.getText().length() == 0 || email.getText().length() == 0) {
+        if (firstName.getText().length() == 0 || lastName.getText().length() == 0 || email.getText().length() == 0 || password.getText().length() == 0) {
             Toast.makeText(this, "Minden mezőt ki kell tölteni!", Toast.LENGTH_SHORT).show();
+            return;
         } else if (!password.getText().toString().equals(passwordAgain.getText().toString())) {
             Toast.makeText(this, "Jelszó nem egyezik!", Toast.LENGTH_SHORT).show();
             return;

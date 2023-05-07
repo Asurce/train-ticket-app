@@ -48,7 +48,7 @@ public class NotificationHelper {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setContentTitle("Jegyvásárlás")
                 .setContentText(message)
-                .setSmallIcon(R.drawable.train_icon)
+                .setSmallIcon(R.drawable.train_icon_outline)
                 .setContentIntent(pendingIntent);
 
         notificationManager.notify(NOTIFICATION_ID, builder.build());
